@@ -2,10 +2,8 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 3
-  tags:
-  - EmptyTile
-  - Iron ore
+  serializedVersion: 2
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -43,11 +41,3 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Madenler
-    uniqueID: 1865190857
-    locked: 0
-  - name: Producers
-    uniqueID: 1249374745
-    locked: 0
-  m_RenderingLayers:
-  - Default
