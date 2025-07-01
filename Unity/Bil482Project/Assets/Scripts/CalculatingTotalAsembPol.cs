@@ -3,18 +3,18 @@ using UnityEngine;
 public class CalculatingTotalAsembPol : MonoBehaviour
 {
     public int TotalAssemblerPollution;
-    public int Tier1Ext;
-    public int Tier2Ext;
-    public int Tier3Ext;
+    public int Tier1Ass;
+    public int Tier2Ass;
+    public int Tier3Ass;
 
     void OnEnable()
     {
-        //MachineManager.OnMachinePlaced += HandleMachinePlaced;
+        BuildingManager.OnAssemblerPlaced += HandleMachinePlaced;
     }
 
     void OnDisable()
     {
-        //MachineManager.OnMachinePlaced -= HandleMachinePlaced;
+        BuildingManager.OnAssemblerPlaced -= HandleMachinePlaced;
     }
 
     void HandleMachinePlaced(int tier)
@@ -22,19 +22,19 @@ public class CalculatingTotalAsembPol : MonoBehaviour
         switch (tier)
         {
             case 1:
-                Tier1Ext++;
+                Tier1Ass++;
                 break;
             case 2:
-                Tier2Ext++;
+                Tier2Ass++;
                 break;
             case 3:
-                Tier3Ext++;
+                Tier3Ass++;
                 break;
         }
     }
 
     void Update()
     {
-        TotalAssemblerPollution = (Tier1Ext * 1) + (Tier2Ext * 2) + (Tier3Ext * 3);
+        TotalAssemblerPollution = (Tier1Ass * 1) + (Tier2Ass * 2) + (Tier3Ass * 3);
     }
 }

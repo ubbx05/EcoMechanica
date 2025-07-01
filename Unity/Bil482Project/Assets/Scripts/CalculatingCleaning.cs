@@ -3,18 +3,18 @@ using UnityEngine;
 public class CalculatingCleaning : MonoBehaviour
 {
     public int TotalCleaning;
-    public int Tier1Ext;
-    public int Tier2Ext;
-    public int Tier3Ext;
+    public int Tier1Cleaner;
+    public int Tier2Cleaner;
+    public int Tier3Cleaner;
 
     void OnEnable()
     {
-        //MachineManager.OnCleanerPlaced += HandleCleanerPlaced;
+        BuildingManager.OnCleanerPlaced += HandleCleanerPlaced;
     }
 
     void OnDisable()
     {
-        //MachineManager.OnCleanerPlaced -= HandleCleanerPlaced;
+        BuildingManager.OnCleanerPlaced -= HandleCleanerPlaced;
     }
 
     void HandleCleanerPlaced(int tier)
@@ -22,19 +22,19 @@ public class CalculatingCleaning : MonoBehaviour
         switch (tier)
         {
             case 1:
-                Tier1Ext++;
+                Tier1Cleaner++;
                 break;
             case 2:
-                Tier2Ext++;
+                Tier2Cleaner++;
                 break;
             case 3:
-                Tier3Ext++;
+                Tier3Cleaner++;
                 break;
         }
     }
 
     void Update()
     {
-        TotalCleaning = (Tier1Ext * 1) + (Tier2Ext * 2) + (Tier3Ext * 3);
+        TotalCleaning = (Tier1Cleaner * 1) + (Tier2Cleaner * 2) + (Tier3Cleaner * 3);
     }
 }

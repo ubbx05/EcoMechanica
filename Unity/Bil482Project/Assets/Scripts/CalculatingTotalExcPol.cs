@@ -9,12 +9,12 @@ public class CalculatingTotalExcPol : MonoBehaviour
 
     void OnEnable()
     {
-        //MachineManager.OnExtractorPlaced += HandleExtractorPlaced;
+        BuildingManager.OnExtractorPlaced += HandleExtractorPlaced;
     }
 
     void OnDisable()
     {
-        //MachineManager.OnExtractorPlaced -= HandleExtractorPlaced;
+        BuildingManager.OnExtractorPlaced -= HandleExtractorPlaced;
     }
 
     void HandleExtractorPlaced(int tier)
