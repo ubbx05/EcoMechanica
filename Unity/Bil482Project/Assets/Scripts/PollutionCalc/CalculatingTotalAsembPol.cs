@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CalculatingTotalAsembPol : MonoBehaviour
 {
-    public int TotalAssemblerPollution;
+    public int TotalAssemblerPollution = 0;
     public int Tier1Ass;
     public int Tier2Ass;
     public int Tier3Ass;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CalculatingCleaning : MonoBehaviour
 {
-    public int TotalCleaning;
+    public  int TotalCleaning = 0;
     public int Tier1Cleaner;
     public int Tier2Cleaner;
     public int Tier3Cleaner;

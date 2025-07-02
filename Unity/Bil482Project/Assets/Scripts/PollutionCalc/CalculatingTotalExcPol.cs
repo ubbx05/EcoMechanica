@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CalculatingTotalExcPol : MonoBehaviour
 {
-    public int TotalExtractorPollution;
+    public int TotalExtractorPollution = 0;
     public int Tier1Ext;
     public int Tier2Ext;
     public int Tier3Ext;
