@@ -9,7 +9,7 @@ public class RaycastMouseOver : MonoBehaviour
     private new Collider2D collider2D;
     private SpriteRenderer spriteRenderer;
     private bool isSelected = false;
-    private static RaycastMouseOver selectedObject = null;
+    public static RaycastMouseOver selectedObject = null;
 
     void Start()
     {

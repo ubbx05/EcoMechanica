@@ -2,8 +2,9 @@ using System;
 using UnityEngine;
 
 public class ConveyorBeltFunctions : MonoBehaviour
-{
-    public Boolean isSelected = true;
+{   
+    public static RaycastMouseOver selectedObject = null;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -13,7 +14,8 @@ public class ConveyorBeltFunctions : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isSelected)
+        // Sadece seçili objede rotasyon yapýlacak
+        if (RaycastMouseOver.selectedObject != null && RaycastMouseOver.selectedObject.gameObject == gameObject)
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
