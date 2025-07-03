@@ -4,7 +4,7 @@ using UnityEngine;
 public class ConveyorBeltFunctions : MonoBehaviour
 {   
     public static RaycastMouseOver selectedObject = null;
-    
+    public int transferyonu = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -19,10 +19,20 @@ public class ConveyorBeltFunctions : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
+                transferyonu += 90;
+                if(transferyonu >= 360)
+                {
+                    transferyonu = transferyonu-360;
+                }
                 transform.Rotate(0, 0, 90);
             }
             if (Input.GetKeyDown(KeyCode.Q))
             {
+                transferyonu -= 90;
+                if (transferyonu < 0)
+                {
+                    transferyonu = transferyonu + 360;
+                }
                 transform.Rotate(0, 0, -90);
             }
         }
