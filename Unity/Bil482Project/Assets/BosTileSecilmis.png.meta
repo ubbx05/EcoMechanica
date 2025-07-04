@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      BosTileSecilmis_0: -3246799430136754689
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

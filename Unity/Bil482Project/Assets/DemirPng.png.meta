@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      DemirPng_0: -6060286748253293606
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

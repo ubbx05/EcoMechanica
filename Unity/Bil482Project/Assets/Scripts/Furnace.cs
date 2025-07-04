@@ -1,8 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Furnace : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public Queue<Resource> inventory = new Queue<Resource>(3);
+    void melt()
+    {
+        Resource resource = inventory.Dequeue();
+        if (resource != null)
+        {
+            
+        }
+        
+    }
     void Start()
     {
         

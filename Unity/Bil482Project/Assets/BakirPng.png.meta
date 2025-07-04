@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      BakirPng_0: -2872133359976489186
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

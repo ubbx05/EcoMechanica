@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      BuildYapmaButonu_0: -7679663423727712201
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

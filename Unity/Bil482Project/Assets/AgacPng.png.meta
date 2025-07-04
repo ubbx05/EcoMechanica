@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      AgacPng_0: -4432530199934859373
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

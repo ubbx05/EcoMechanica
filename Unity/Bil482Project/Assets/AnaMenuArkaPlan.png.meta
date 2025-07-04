@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      AnaMenuArkaPlan_0: 4901678552518240726
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

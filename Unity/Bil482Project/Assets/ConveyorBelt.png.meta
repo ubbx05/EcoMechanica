@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      ConveyorBelt_0: -2171869769579782635
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
