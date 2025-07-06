@@ -7,6 +7,22 @@ TagManager:
   - BosTile
   - ConveyorBelt
   - Extractor
+  - Cleaner
+  - Fabrika
+  - Furnace
+  - Atolye
+  - Agac
+  - Demir
+  - Bakir
+  - Odun
+  - HamDemir
+  - HamBakir
+  - Kalas
+  - DemirIngot
+  - BakirIngot
+  - PlankFrame
+  - BakirTel
+  - DemirDisli
   layers:
   - Default
   - TransparentFX
@@ -49,6 +65,12 @@ TagManager:
     locked: 0
   - name: BosTiles
     uniqueID: 1371868357
+    locked: 0
+  - name: Madenler
+    uniqueID: 1474791453
+    locked: 0
+  - name: FabrikalarveBeltler
+    uniqueID: 869976787
     locked: 0
   - name: Urunler
     uniqueID: 2247086471

@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1876197588737545574}
   - component: {fileID: 5370344122820669352}
-  - component: {fileID: 4945583015319643532}
   - component: {fileID: 8059819685212579104}
+  - component: {fileID: 2748640441862155479}
   m_Layer: 0
   m_Name: BosTilePng
   m_TagString: Untagged
@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 6139898334412042201}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.59, y: 1, z: 0.016833669}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -89,20 +89,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4945583015319643532
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6139898334412042201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b340d8993db32149bf2253de22bda2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  overSprite: {fileID: -3246799430136754689, guid: a03763c6efcb1134fa1dafe4536f0353, type: 3}
-  notOverSprite: {fileID: -7702491944595725835, guid: 1087420524011da4b92e8fb688e9973b, type: 3}
 --- !u!61 &8059819685212579104
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -149,6 +135,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.64, y: 0.64}
   m_EdgeRadius: 0
+--- !u!114 &2748640441862155479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6139898334412042201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b340d8993db32149bf2253de22bda2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  overSprite: {fileID: -3246799430136754689, guid: a03763c6efcb1134fa1dafe4536f0353, type: 3}
+  notOverSprite: {fileID: -7702491944595725835, guid: 1087420524011da4b92e8fb688e9973b, type: 3}
 --- !u!1 &8075960262031708089
 GameObject:
   m_ObjectHideFlags: 0
@@ -160,7 +160,7 @@ GameObject:
   - component: {fileID: 1194616122512689697}
   m_Layer: 0
   m_Name: BosTile
-  m_TagString: Untagged
+  m_TagString: BosTile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -174,7 +174,7 @@ Transform:
   m_GameObject: {fileID: 8075960262031708089}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.087, y: 0.542, z: -0.016833669}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4905790987130782222}
   - component: {fileID: 5423023021293269310}
   - component: {fileID: 8823140317340636205}
-  - component: {fileID: 1440503247010976657}
+  - component: {fileID: 4061867687800840590}
   - component: {fileID: 2603391889241559}
   m_Layer: 0
   m_Name: ConveyorBeltPng
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1846194738435336218}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -76,10 +76,10 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -2047880825
-  m_SortingLayer: 2
+  m_SortingLayerID: 869976787
+  m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2171869769579782635, guid: 363ec9c892f636948a60bced437ac15e, type: 3}
+  m_Sprite: {fileID: 6805694955532913253, guid: 287bd0c8392113947aed49ce98d258b3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -136,7 +136,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.64, y: 0.64}
   m_EdgeRadius: 0
---- !u!114 &1440503247010976657
+--- !u!114 &4061867687800840590
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -148,8 +148,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b340d8993db32149bf2253de22bda2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  overSprite: {fileID: -8767782080541083551, guid: f5566822d706af649ac48ad4ef3eefca, type: 3}
-  notOverSprite: {fileID: -2171869769579782635, guid: 363ec9c892f636948a60bced437ac15e, type: 3}
+  overSprite: {fileID: -6981763169929068377, guid: fb6aa6639c324a1498279d4279d03683, type: 3}
+  notOverSprite: {fileID: 6805694955532913253, guid: 287bd0c8392113947aed49ce98d258b3, type: 3}
 --- !u!114 &2603391889241559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,7 +174,7 @@ GameObject:
   - component: {fileID: 1874489658759800869}
   m_Layer: 0
   m_Name: ConveyorBelt
-  m_TagString: Untagged
+  m_TagString: ConveyorBelt
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
