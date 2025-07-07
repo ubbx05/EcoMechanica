@@ -5,7 +5,7 @@ public class RaycastMouseOver : MonoBehaviour
     [SerializeField] private Sprite overSprite;
     [SerializeField] private Sprite notOverSprite;
    
-
+    //MADENLERDE VESAÝRE ÝLK BAÞTA KIYAS YAPILACAK Z EKSENÝ HANGÝSÝNÝN DAHA YÜKSEKSE O 0 A EÞÝT KABUL EDÝLECEK
     private new Collider2D collider2D;
     private SpriteRenderer spriteRenderer;
     private bool isSelected = false;

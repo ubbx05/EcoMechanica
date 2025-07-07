@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1886481532521921567}
-  - component: {fileID: 3169942064181469135}
   m_Layer: 0
   m_Name: Atolye
   m_TagString: Atolye
@@ -26,25 +25,13 @@ Transform:
   m_GameObject: {fileID: 1007234029868629786}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -3}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3852781094881606667}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3169942064181469135
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1007234029868629786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 293e784f6ff793044890b16dc419a09d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3150666818833971525
 GameObject:
   m_ObjectHideFlags: 0
@@ -57,6 +44,9 @@ GameObject:
   - component: {fileID: 5606282410842338187}
   - component: {fileID: 5715889502920343018}
   - component: {fileID: 2331976882264859141}
+  - component: {fileID: 3171608566188677373}
+  - component: {fileID: 1768781154369017375}
+  - component: {fileID: 7913934000305619610}
   m_Layer: 0
   m_Name: AtolyePng_0
   m_TagString: Untagged
@@ -73,8 +63,8 @@ Transform:
   m_GameObject: {fileID: 3150666818833971525}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -3}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1886481532521921567}
@@ -217,3 +207,42 @@ CapsuleCollider2D:
   m_Offset: {x: 0.30089566, y: -0.00030370554}
   m_Size: {x: 0.041880053, y: 0.5590295}
   m_Direction: 0
+--- !u!114 &3171608566188677373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3150666818833971525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e019f77d3bca12f4ba44fc4e131c9933, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transferyonu: 1
+--- !u!114 &1768781154369017375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3150666818833971525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b340d8993db32149bf2253de22bda2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  overSprite: {fileID: 3306432265747269768, guid: 5f7541760da411741ac25f4f120f6744, type: 3}
+  notOverSprite: {fileID: 3306432265747269768, guid: 5f7541760da411741ac25f4f120f6744, type: 3}
+--- !u!114 &7913934000305619610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3150666818833971525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 293e784f6ff793044890b16dc419a09d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5423023021293269310}
   - component: {fileID: 8823140317340636205}
   - component: {fileID: 4061867687800840590}
-  - component: {fileID: 2603391889241559}
+  - component: {fileID: 8002489102157413028}
   m_Layer: 0
   m_Name: ConveyorBeltPng
   m_TagString: Untagged
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1846194738435336218}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overSprite: {fileID: -6981763169929068377, guid: fb6aa6639c324a1498279d4279d03683, type: 3}
   notOverSprite: {fileID: 6805694955532913253, guid: 287bd0c8392113947aed49ce98d258b3, type: 3}
---- !u!114 &2603391889241559
+--- !u!114 &8002489102157413028
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,7 +159,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1846194738435336218}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4681aa83ec9024844bf155ef6db8dab9, type: 3}
+  m_Script: {fileID: 11500000, guid: e019f77d3bca12f4ba44fc4e131c9933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   transferyonu: 0
@@ -188,7 +188,7 @@ Transform:
   m_GameObject: {fileID: 8427649382195643697}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -2}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

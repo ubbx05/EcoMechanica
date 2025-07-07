@@ -1,29 +1,62 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GameController : MonoBehaviour
 {
-    Extractor bronzeExtractor;
-    Extractor ironExtractor;
+    // Scene'deki tüm extractor'larý tutacak liste
+    private List<Extractor> extractors = new List<Extractor>();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // Extraction timer
+    private float extractingTimer = 3f;
+
     void Start()
     {
-        bronzeExtractor = new Extractor(new BronzeExtractingStrategy());
-        ironExtractor = new Extractor(new IronExtractingStrategy());
+        // Scene'deki tüm Extractor'larý bul
+        GameObject[] extractorObjects = GameObject.FindGameObjectsWithTag("Extractor");
+
+        foreach (GameObject extractorObj in extractorObjects)
+        {
+            Extractor extractor = extractorObj.GetComponent<Extractor>();
+            if (extractor != null)
+            {
+                extractors.Add(extractor);
+            }
+        }
+
+        //Debug.Log($"Found {extractors.Count} extractors in the scene");
     }
 
-    float extractingTimer = 3f;
-
-    // Update is called once per frame
     void Update()
     {
         extractingTimer -= Time.deltaTime;
+
         if (extractingTimer < 0)
         {
-            bronzeExtractor.extractResource();
-            ironExtractor.extractResource();
+            // Tüm extractor'larý çalýþtýr
+            foreach (Extractor extractor in extractors)
+            {
+                extractor.ExtractResource();
+            }
+
             extractingTimer = 3f;
         }
-            
+    }
+
+    // Yeni extractor ekleme metodu
+    public void AddExtractor(Extractor newExtractor)
+    {
+        if (!extractors.Contains(newExtractor))
+        {
+            extractors.Add(newExtractor);
+        }
+    }
+
+    // Extractor kaldýrma metodu
+    public void RemoveExtractor(Extractor extractorToRemove)
+    {
+        if (extractors.Contains(extractorToRemove))
+        {
+            extractors.Remove(extractorToRemove);
+        }
     }
 }
