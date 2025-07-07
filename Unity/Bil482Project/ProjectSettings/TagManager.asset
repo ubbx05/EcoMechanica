@@ -78,5 +78,8 @@ TagManager:
   - name: PlayerUI
     uniqueID: 179087273
     locked: 0
+  - name: MenuUI
+    uniqueID: 3252317731
+    locked: 0
   m_RenderingLayers:
   - Default

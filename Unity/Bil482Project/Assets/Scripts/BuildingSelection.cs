@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class BuildingSelection : MonoBehaviour
 {
-    public GameObject selectedObj;
     [SerializeField] GameObject extractorPrefab;
     [SerializeField] GameObject assemblerPrefab;
     [SerializeField] GameObject cleanerPrefab;
@@ -12,41 +11,41 @@ public class BuildingSelection : MonoBehaviour
 
     void Start()
     {
-        selectedObj = null;
+        BuildingManager.SelectedPrefab = null;
     }
 
     public void SelectWorkshop()
     {
-        selectedObj = workshopPrefab;
+        BuildingManager.SelectedPrefab = workshopPrefab;
         SceneManager.LoadScene("GameScene");
     }
     public void SelectExtractor()
     {
-        selectedObj = extractorPrefab;
+        BuildingManager.SelectedPrefab = extractorPrefab;
         SceneManager.LoadScene("GameScene");
     }
 
     public void SelectAssembler()
     {
-        selectedObj = assemblerPrefab;
+        BuildingManager.SelectedPrefab = assemblerPrefab;
         SceneManager.LoadScene("GameScene");
     }
 
     public void SelectCleaner()
     {
-        selectedObj = cleanerPrefab;
+        BuildingManager.SelectedPrefab = cleanerPrefab;
         SceneManager.LoadScene("GameScene");
     }
 
     public void SelectFurnace()
     {
-        selectedObj = furnacePrefab;
+        BuildingManager.SelectedPrefab = furnacePrefab;
         SceneManager.LoadScene("GameScene");
     }
 
     public void SelectConveyorBelt()
     {
-        selectedObj = conveyorBeltPrefab;
+        BuildingManager.SelectedPrefab = conveyorBeltPrefab;
         SceneManager.LoadScene("GameScene");
     }
 }
