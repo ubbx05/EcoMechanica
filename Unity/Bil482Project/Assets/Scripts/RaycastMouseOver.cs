@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class RaycastMouseOver : MonoBehaviour
 {
@@ -27,27 +28,30 @@ public class RaycastMouseOver : MonoBehaviour
         // Sol týk ile seçim
         if (Input.GetMouseButtonDown(0))
         {
-            if (hit == collider2D)
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
-                if (selectedObject == this)
+
+                if (hit == collider2D)
                 {
-                    // Ayný objeye týklandýysa seçimi kaldýr
+                    if (selectedObject == this)
+                    {
+                        // Ayný objeye týklandýysa seçimi kaldýr
+                        Deselect();
+                    }
+                    else
+                    {
+                        if (selectedObject != null)
+                            selectedObject.Deselect();
+                        Select();
+                    }
+                }
+                else if (selectedObject == this)
+                {
+                    // Baþka bir yere týklandýysa, seçimi kaldýr
                     Deselect();
                 }
-                else
-                {
-                    if (selectedObject != null)
-                        selectedObject.Deselect();
-                    Select();
-                }
-            }
-            else if (selectedObject == this)
-            {
-                // Baþka bir yere týklandýysa, seçimi kaldýr
-                Deselect();
             }
         }
-
         // Sað týk ile seçim kaldýrma
         if (Input.GetMouseButtonDown(1) && isSelected)
         {
@@ -60,6 +64,10 @@ public class RaycastMouseOver : MonoBehaviour
         isSelected = true;
         selectedObject = this;
         spriteRenderer.sprite = overSprite;
+        if (!gameObject.name.Contains("Bos"))
+        {
+            ToolTipManager.Instance?.ShowToolTip($"Bina: {gameObject.name}", $"Seviye: 1");
+        }
         Debug.Log($"Seçildi: {gameObject.name}");
     }
 
@@ -69,6 +77,7 @@ public class RaycastMouseOver : MonoBehaviour
         if (selectedObject == this)
             selectedObject = null;
         spriteRenderer.sprite = notOverSprite;
+        ToolTipManager.Instance?.HideToolTip();
         Debug.Log($"Seçim kaldýrýldý: {gameObject.name}");
     }
 

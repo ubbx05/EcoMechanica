@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1886481532521921567}
+  - component: {fileID: -7443540283031343380}
   m_Layer: 0
   m_Name: Atolye
   m_TagString: Atolye
@@ -32,6 +33,20 @@ Transform:
   - {fileID: 3852781094881606667}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-7443540283031343380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007234029868629786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35b1345399acc2c4fb89155afc840394, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tier: 1
+  upgradedPrefab: {fileID: 1648028292754752469, guid: f772cdc6335537f4298e79cc6f7c50f2, type: 3}
 --- !u!1 &3150666818833971525
 GameObject:
   m_ObjectHideFlags: 0

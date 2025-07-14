@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4280397920319952644}
+  - component: {fileID: 5110749490728551648}
   m_Layer: 0
   m_Name: Fabrika
   m_TagString: Fabrika
@@ -32,6 +33,20 @@ Transform:
   - {fileID: 3603860482329008304}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5110749490728551648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3384426739624956686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35b1345399acc2c4fb89155afc840394, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tier: 1
+  upgradedPrefab: {fileID: 0}
 --- !u!1 &8118419395021042645
 GameObject:
   m_ObjectHideFlags: 0
