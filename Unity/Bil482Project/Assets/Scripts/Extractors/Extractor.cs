@@ -9,9 +9,16 @@ public class Extractor : MonoBehaviour
     public GameObject hamBakirPrefab;
     public GameObject hamDemirPrefab;
     public GameObject odunPrefab;
+    public GameObject sand;
+    public GameObject coal;
+    public GameObject stone;
+    public GameObject hamGold;
 
     [Header("Extraction Settings")]
     [SerializeField] private float extractionInterval = 4f; // 4 saniyede bir
+
+    [Header("Extractor Level")]
+    [SerializeField] private int extractorLevel = 1;
 
     private ExtractingStrategy extractingStrategy;
     private GameObject currentResource; // Üzerinde bulunduðu kaynak
@@ -116,10 +123,12 @@ public class Extractor : MonoBehaviour
         }
     }
 
+    // Strategy set edilirken decorator ekle
     private void SetNewStrategy(ExtractingStrategy newStrategy, GameObject resource)
     {
         StopExtraction();
-        extractingStrategy = newStrategy;
+        // Decorator ile sarmala
+        extractingStrategy = new LevelExtractingStrategyDecorator(newStrategy, extractorLevel);
         currentResource = resource;
         StartExtraction();
     }
@@ -293,6 +302,26 @@ public class Extractor : MonoBehaviour
         if (extractingStrategy != null)
         {
             StartExtraction();
+        }
+    }
+
+    // Seviye set/get
+    public int ExtractorLevel
+    {
+        get => extractorLevel;
+        set
+        {
+            extractorLevel = value;
+            UpdateStrategyLevel();
+        }
+    }
+
+    // Seviye deðiþtiðinde strategy'yi güncelle
+    private void UpdateStrategyLevel()
+    {
+        if (extractingStrategy != null)
+        {
+            extractingStrategy = new LevelExtractingStrategyDecorator(extractingStrategy, extractorLevel);
         }
     }
 

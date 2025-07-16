@@ -22,10 +22,17 @@ public class ResourceRequirement
 public enum ResourceType
 {
     Wood,
+    Sand,
+    Bronze,
     Iron,
     Stone,
     Coal,
-    Gold
+    Gold,
+    Concrete,
+    Steel,
+    Silicon,
+    Magnet,
+    Circuitboard
 }
 
 public enum ResearchState
@@ -134,6 +141,7 @@ public class ResearchTree : MonoBehaviour
     private Dictionary<string, ResearchNode> nodeMap;
 
     public static ResearchTree Instance { get; private set; }
+    public static int ExtractorLevelUnlocked = 1;
 
     void Awake()
     {
@@ -186,16 +194,65 @@ public class ResearchTree : MonoBehaviour
         steelProduction.AddResourceRequirement(ResourceType.Coal, 15);
         steelProduction.prerequisiteIds.Add("iron_forging");
 
+        ResearchNode magnetProduction = new ResearchNode("magnet_production", "Magnet Production", "Unlocks the ability to produce magnets for advanced machinery");
+        magnetProduction.AddResourceRequirement(ResourceType.Iron, 25);
+        magnetProduction.AddResourceRequirement(ResourceType.Bronze, 20);
+        magnetProduction.prerequisiteIds.Add("steel_production");
+
+        ResearchNode concreteProduction = new ResearchNode("concrete_production", "Concrete Production", "Unlocks the ability to produce concrete for building structures");
+        concreteProduction.AddResourceRequirement(ResourceType.Stone, 30);
+        concreteProduction.AddResourceRequirement(ResourceType.Sand, 10);
+        concreteProduction.prerequisiteIds.Add("steel_production");
+
+        ResearchNode advancedForging = new ResearchNode("advanced_forging", "Advanced Forging", "Forge resources faster");
+        advancedForging.AddResourceRequirement(ResourceType.Concrete, 20);
+        advancedForging.AddResourceRequirement(ResourceType.Gold, 15);
+        advancedForging.prerequisiteIds.Add("concrete_production");
+
+        ResearchNode siliconProduction = new ResearchNode("silicon_production", "Silicon Production", "Produce silicon for electronics");
+        siliconProduction.AddResourceRequirement(ResourceType.Sand, 15);
+        siliconProduction.AddResourceRequirement(ResourceType.Steel, 5);
+        siliconProduction.prerequisiteIds.Add("magnet_production");
+
+        ResearchNode circuitboardProduciton = new ResearchNode("circuitboard_production", "Circuit Board Production", "Produce circuit boards for electronics");
+        circuitboardProduciton.AddResourceRequirement(ResourceType.Silicon, 10);
+        circuitboardProduciton.AddResourceRequirement(ResourceType.Magnet, 5);
+        circuitboardProduciton.prerequisiteIds.Add("magnet_production");
+
+        ResearchNode advancedSteelProduction = new ResearchNode("advanced_steel_production", "Advanced Steel Production", "Produce steel faster");
+        advancedSteelProduction.AddResourceRequirement(ResourceType.Steel, 30);
+        advancedSteelProduction.AddResourceRequirement(ResourceType.Gold, 30);
+        advancedSteelProduction.prerequisiteIds.Add("silikon_produciton");
+
+        ResearchNode computerProduction = new ResearchNode("computer_production", "Computer Production", "Produce computers for cleaners");
+        computerProduction.AddResourceRequirement(ResourceType.Circuitboard, 10);
+        computerProduction.AddResourceRequirement(ResourceType.Steel, 2);
+        computerProduction.prerequisiteIds.Add("circuitboard_production");
+
         // Tree'ye ekle
         AddNodeToTree(basicWoodworking);
         AddNodeToTree(ironForging);
         AddNodeToTree(advancedMining);
         AddNodeToTree(steelProduction);
+        AddNodeToTree(magnetProduction);
+        AddNodeToTree(concreteProduction);
+        AddNodeToTree(advancedForging);
+        AddNodeToTree(siliconProduction);
+        AddNodeToTree(circuitboardProduciton);
+        AddNodeToTree(advancedSteelProduction);
+        AddNodeToTree(computerProduction);
 
         // Unlock iliþkilerini kur
         basicWoodworking.unlocksIds.Add("iron_forging");
         ironForging.unlocksIds.Add("advanced_mining");
         ironForging.unlocksIds.Add("steel_production");
+        steelProduction.unlocksIds.Add("magnet_production");
+        steelProduction.unlocksIds.Add("concrete_production");
+        magnetProduction.unlocksIds.Add("silicon_production");
+        magnetProduction.unlocksIds.Add("circuitboard_production");
+        siliconProduction.unlocksIds.Add("advanced_steel_production");
+        circuitboardProduciton.unlocksIds.Add("computer_production");
+        
 
         CheckAndUpdateUnlocks();
     }
@@ -343,7 +400,6 @@ public class ResearchTree : MonoBehaviour
 
     private void OnResearchCompleted(ResearchNode node)
     {
-        // Research tamamlandýðýnda oyun mekaniði efektleri
         switch (node.id)
         {
             case "basic_woodworking":
@@ -357,6 +413,7 @@ public class ResearchTree : MonoBehaviour
             case "advanced_mining":
                 // Maden çýkarma verimliliði artýrýldý
                 Debug.Log("Mining efficiency increased!");
+                ExtractorLevelUnlocked = 2;
                 break;
             case "steel_production":
                 // Çelik üretimi açýldý
