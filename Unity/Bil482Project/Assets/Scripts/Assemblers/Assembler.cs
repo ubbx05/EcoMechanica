@@ -1,11 +1,27 @@
 using UnityEngine;
 
-public class Assembler : MonoBehaviour
+public class Assembler : Machine
 {
-    public Assembler()
+    public override void AcceptProduct(GameObject product)
     {
-
+        throw new System.NotImplementedException();
     }
+
+    public override bool CanAcceptProduct(GameObject product)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override GameObject GetOutputProduct()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override bool HasProductToOutput()
+    {
+        throw new System.NotImplementedException();
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

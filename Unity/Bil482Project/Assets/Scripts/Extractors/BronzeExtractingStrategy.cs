@@ -12,13 +12,15 @@ public class BronzeExtractingStrategy : ExtractingStrategy
 
         if (hamBakirPrefab == null)
         {
-            //Debug.LogError("HamBakir prefab is not assigned!");
+            Debug.LogError("HamBakir prefab is not assigned!");
         }
     }
 
     public void extract()
     {
-       // Debug.Log("1 Bronze extracted");
+        Debug.Log("1 Bronze extracted");
         extractor.SpawnResource(hamBakirPrefab);
     }
+
+    
 }

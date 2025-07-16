@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8823140317340636205}
   - component: {fileID: 4061867687800840590}
   - component: {fileID: 8002489102157413028}
+  - component: {fileID: 6611745919926317273}
   m_Layer: 0
   m_Name: ConveyorBeltPng
   m_TagString: Untagged
@@ -162,7 +163,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e019f77d3bca12f4ba44fc4e131c9933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  transferyonu: 0
+  transferyonu: 3
+--- !u!114 &6611745919926317273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846194738435336218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 182a3db38717b1e4a930fc91cce25701, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8427649382195643697
 GameObject:
   m_ObjectHideFlags: 0

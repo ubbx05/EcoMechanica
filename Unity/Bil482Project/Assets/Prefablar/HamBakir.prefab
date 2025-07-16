@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1241606362676511059}
   m_Layer: 0
   m_Name: HamBakir
-  m_TagString: Untagged
+  m_TagString: HamBakir
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 6386264642881649605}
   - component: {fileID: 609705328499733666}
   - component: {fileID: 1999506391574726882}
+  - component: {fileID: 3031696816686346623}
   m_Layer: 0
   m_Name: "bak\u0131r_ham_0"
   m_TagString: HamBakir
@@ -106,8 +107,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -2047880825
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 7372638463262475205, guid: c6c7d48e2fae213418b6d171f3c49b4d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -166,3 +167,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.34, y: 0.28}
   m_EdgeRadius: 0
+--- !u!114 &3031696816686346623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6291790120836233689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb699ad8eb7b38d4c957daac5444e701, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceType: HamBakir

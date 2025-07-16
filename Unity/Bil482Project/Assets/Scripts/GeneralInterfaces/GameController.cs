@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 public class GameController : MonoBehaviour
 {
+    //Starting Gold 
+    public int Gold = 1000;
+    
     // Scene'deki tüm extractor'larý tutacak liste
     private List<Extractor> extractors = new List<Extractor>();
 

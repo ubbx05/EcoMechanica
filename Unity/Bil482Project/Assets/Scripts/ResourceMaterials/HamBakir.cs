@@ -1,6 +1,10 @@
 using UnityEngine;
 
-public class HamBakir : MonoBehaviour
+public class HamBakir : Resource
 {
-    public string resourceType = "HamBakir";
+    private void Awake()
+    {
+        resourceType = "HamBakir";
+        resourceIncome = 1;
+    }
 }

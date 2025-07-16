@@ -15,7 +15,8 @@ public class BuildingManager : MonoBehaviour
     private GameObject previewInstance;
 
     public static int SelectedTier = 1;
-
+    [SerializeField]public RotatingBuildings rotator;
+    private int yon;
     public void PlaceAssembler(int tier, Vector3 position, GameObject prefab)
     {
         Instantiate(prefab, position, Quaternion.identity);
@@ -53,6 +54,8 @@ public class BuildingManager : MonoBehaviour
     void Start()
     {
         
+        
+
     }
 
     // Update is called once per frame
@@ -69,15 +72,18 @@ public class BuildingManager : MonoBehaviour
             {
                 Vector3 placePos = hit.collider.transform.position;
                 previewInstance.transform.position = placePos;
-
+                
                 // Q ve E tuþlarýyla preview'ý döndür
                 if (Input.GetKeyDown(KeyCode.Q))
                 {
                     previewInstance.transform.Rotate(0, 0, 90f);
+                    
+                    rotator.SetTransferYonu(rotator.GetTransferYonu() + 1);
                 }
                 else if (Input.GetKeyDown(KeyCode.E))
                 {
                     previewInstance.transform.Rotate(0, 0, -90f);
+                    rotator.SetTransferYonu(rotator.GetTransferYonu() - 1);
                 }
 
                 if (Input.GetMouseButtonDown(0))
