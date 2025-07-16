@@ -232,7 +232,7 @@ public class ResearchLab : MonoBehaviour
         }
         else if (obj.GetComponent<HamBakir>() != null)
         {
-            CollectLegacyResource(obj, ResourceType.Coal);
+            CollectLegacyResource(obj, ResourceType.CopperOre);
         }
     }
 
@@ -350,7 +350,7 @@ public class ResearchLab : MonoBehaviour
             case "HamDemir":
                 return ResourceType.Iron;
             case "HamBakir":
-                return ResourceType.Coal;
+                return ResourceType.CopperOre;
             default:
                 return ResourceType.Wood; // Default deðer
         }
