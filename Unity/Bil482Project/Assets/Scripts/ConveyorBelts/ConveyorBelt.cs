@@ -14,6 +14,7 @@ public class ConveyorBelt : MonoBehaviour
     bool flag1 = true;
     bool flag2 = true;
     bool flag3 = true;
+    bool flag4 = true;
     void Start()
     {
         determineNextConveyorBelt();
@@ -53,13 +54,14 @@ public class ConveyorBelt : MonoBehaviour
                 if (flag3 == true) {
                     Debug.Log("Next conveyor belt found");
                     flag3 = false;
+                    flag4 = false;
                 }
                 flag1 = true;
                 flag2 = true;
             }
             else
             {
-                if (flag1 == true)
+                if (flag1 == true && flag4 == true)
                 {
                     Debug.Log("diger belt bulunamadi");
                     flag1 = false;
