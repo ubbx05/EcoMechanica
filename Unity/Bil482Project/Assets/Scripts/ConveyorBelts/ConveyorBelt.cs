@@ -32,10 +32,10 @@ public class ConveyorBelt : MonoBehaviour
     }
     private static readonly Vector2Int[] directionOffsets = new Vector2Int[]
     {
-        new Vector2Int(1, 0),   // sað
-        new Vector2Int(0, 1),   // yukarý
+        new Vector2Int(1, 0),   // saï¿½
+        new Vector2Int(0, 1),   // yukarï¿½
         new Vector2Int(-1, 0),  // sol
-        new Vector2Int(0, -1)   // aþaðý
+        new Vector2Int(0, -1)   // aï¿½aï¿½ï¿½
     };
     public void determineNextConveyorBelt()
     {
@@ -79,9 +79,9 @@ public class ConveyorBelt : MonoBehaviour
     public void transportingRes()
     {
         Vector3 move = Vector3.zero;
-        if (isEmpty == false && resourcePrefab != null && nextConveyorBelt.isEmpty)
+        if (nextConveyorBelt != null && isEmpty == false && resourcePrefab != null && nextConveyorBelt.isEmpty)
         {
-            if (rotator.transferyonu == 0) // asagi bakýyor 
+            if (rotator.transferyonu == 0) // asagi bakï¿½yor 
             {
                 move = new Vector3(0f, 1f, 0f).normalized * speed * Time.deltaTime;
             }
@@ -98,6 +98,10 @@ public class ConveyorBelt : MonoBehaviour
                 move = new Vector3(-1f, 0f, 0f).normalized * speed * Time.deltaTime;
             }
             resourcePrefab.transform.position += move;
+
+            //Mevcut kaynak next belte gÃ¶nderiliyor
+            nextConveyorBelt.resourcePrefab = resourcePrefab;
+
             isEmpty = true;
         }
         else
