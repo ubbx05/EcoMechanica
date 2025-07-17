@@ -217,16 +217,16 @@ public class Extractor : MonoBehaviour
         switch (yon)
         {
             case 0: // Sað
-                offset = new Vector3(0.75f, 0f, 0f);
+                offset = new Vector3(1f, 0f, 0f);
                 break;
             case 1: // Yukarý
-                offset = new Vector3(0f, 0.75f, 0f);
+                offset = new Vector3(0f, 1f, 0f);
                 break;
             case 2: // Sol
-                offset = new Vector3(-0.75f, 0f, 0f);
+                offset = new Vector3(-1f, 0f, 0f);
                 break;
-            case 3: // Aþaðý
-                offset = new Vector3(0f, -0.75f, 0f);
+            case 3: // Aþaðýzz
+                offset = new Vector3(0f, -1f, 0f);
                 break;
         }
 

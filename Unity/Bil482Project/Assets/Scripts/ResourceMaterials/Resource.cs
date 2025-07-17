@@ -15,4 +15,6 @@ public abstract class Resource : MonoBehaviour
     {
         return resourceIncome;
     }
+
+
 }

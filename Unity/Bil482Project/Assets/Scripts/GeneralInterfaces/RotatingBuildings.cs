@@ -16,7 +16,7 @@ public class RotatingBuildings : MonoBehaviour
         // Sadece seçili objede rotasyon yapýlacak
         if (RaycastMouseOver.selectedObject != null && RaycastMouseOver.selectedObject.gameObject == gameObject)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.Q))
             {
                 transferyonu += 1;
                 if (transferyonu >= 4)
@@ -25,7 +25,7 @@ public class RotatingBuildings : MonoBehaviour
                 }
                 transform.Rotate(0, 0, 90);
             }
-            if (Input.GetKeyDown(KeyCode.Q))
+            if (Input.GetKeyDown(KeyCode.E))
             {
                 transferyonu -= 1;
                 if (transferyonu < 0)
