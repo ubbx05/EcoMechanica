@@ -23,6 +23,7 @@ TagManager:
   - PlankFrame
   - BakirTel
   - DemirDisli
+  - ResearchLab
   layers:
   - Default
   - TransparentFX

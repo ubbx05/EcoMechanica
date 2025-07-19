@@ -15,7 +15,7 @@ public class WorkshopSelectionUI : MonoBehaviour
         switch (recipeIndex)
         {
             case 0:
-                selectedWorkshop.SetStrategy(new PlankCraftStrategy());
+                selectedWorkshop.SetStrategy(new PlankCraftStrategy(selectedWorkshop , selectedWorkshop.plankPrefab));
                 break;
             case 1:
                 //selectedWorkshop.SetStrategy(new CopperWireCraftStrategy());

@@ -6,11 +6,14 @@ public class Workshop : Machine
     public enum CraftingRecipe
     {
         Plank,
-        CopperWire
+        CopperWire,
+        Steel
     }
 
-    private GameObject plankPrefab;
+    public GameObject plankPrefab;
     public GameObject odunPrefab;
+    public GameObject copperWirePrefab;
+    public GameObject steelPrefab;
 
     [SerializeField] private float craftingInterval = 4f; // 4 saniyede bir üretim yapacak
     private RotatingBuildings rotator;
@@ -77,12 +80,12 @@ public class Workshop : Machine
                 break;
 
             case CraftingRecipe.CopperWire:
-                SetStrategy(new CopperCraftWireStrategy());
+                SetStrategy(new CopperWireCraftStrategy(this , copperWirePrefab));
                 Debug.Log("Copper wire strategy selected");
                 break;
 
-            case CraftingRecipe.IronPlate:
-                SetStrategy(new IronCraftPlateStrategy());
+            case CraftingRecipe.Steel:
+                SetStrategy(new SteelCraftStrategy(this , steelPrefab));
                 Debug.Log("Iron plate strategy selected");
                 break;
 

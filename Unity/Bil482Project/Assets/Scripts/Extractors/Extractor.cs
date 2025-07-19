@@ -13,8 +13,12 @@ public class Extractor : MonoBehaviour
     [Header("Extraction Settings")]
     [SerializeField] private float extractionInterval = 4f; // 4 saniyede bir
 
+    // Conveyor Belt'e bildirim göndermek için Action - Resource type bilgisi ile
+    // Action parametreleri: (ResourcePrefab, BeltPosition, ResourceType)
+    public static Action<GameObject, Vector3, ResourceType> OnResourceSpawned;
+
     private ExtractingStrategy extractingStrategy;
-    private GameObject currentResource; // �zerinde bulundu�u kaynak
+    private GameObject currentResource; // Üzerinde bulunduğu kaynak
     private Coroutine extractionCoroutine;
     private RotatingBuildings rotator;
     private int yon;
@@ -28,25 +32,25 @@ public class Extractor : MonoBehaviour
             yon = rotator.GetTransferYonu();
         }
 
-        // BoxCollider2D kontrol�
+        // BoxCollider2D kontrolü
         if (GetComponent<BoxCollider2D>() == null)
         {
             Debug.LogWarning("Extractor needs a BoxCollider2D component!");
         }
 
-        // Prefab kontrol�
+        // Prefab kontrolü
         if (hamBakirPrefab == null || hamDemirPrefab == null || odunPrefab == null)
         {
             Debug.LogError("Please assign all resource prefabs in the Inspector!");
         }
 
-        // �lk ba�ta hangi kayna��n �zerindeyse onu belirle
+        // İlk başta hangi kaynağın üzerindeyse onu belirle
         DetermineExtractionStrategy();
     }
 
     void Update()
     {
-        // Her frame'de pozisyon ve y�n kontrol�
+        // Her frame'de pozisyon ve yön kontrolü
         DetermineExtractionStrategy();
         if (rotator != null)
         {
@@ -54,15 +58,15 @@ public class Extractor : MonoBehaviour
         }
     }
 
-    // Tag'lere g�re strategy mapping
+    // Tag'lere göre strategy mapping
     private void DetermineExtractionStrategy()
     {
-        // Extractor'�n alt�nda hangi resource oldu�unu kontrol et
+        // Extractor'ın altında hangi resource olduğunu kontrol et
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, GetComponent<BoxCollider2D>().size, 0f);
 
         foreach (Collider2D collider in colliders)
         {
-            // Bronze (Bak�r) madeni kontrol�
+            // Bronze (Bakır) madeni kontrolü
             if (collider.CompareTag("Bakir"))
             {
                 if (extractingStrategy == null || !(extractingStrategy is BronzeExtractingStrategy))
@@ -76,7 +80,7 @@ public class Extractor : MonoBehaviour
                 }
                 return;
             }
-            // Iron (Demir) madeni kontrol�
+            // Iron (Demir) madeni kontrolü
             else if (collider.CompareTag("Demir"))
             {
                 if (extractingStrategy == null || !(extractingStrategy is IronExtractingStrategy))
@@ -90,7 +94,7 @@ public class Extractor : MonoBehaviour
                 }
                 return;
             }
-            // Wood (Odun) kontrol�
+            // Wood (Odun) kontrolü
             else if (collider.CompareTag("Agac"))
             {
                 if (extractingStrategy == null || !(extractingStrategy is WoodExtractingStrategy))
@@ -106,7 +110,7 @@ public class Extractor : MonoBehaviour
             }
         }
 
-        // Hi�bir kaynak bulunamad�ysa
+        // Hiçbir kaynak bulunamadıysa
         if (extractingStrategy != null)
         {
             StopExtraction();
@@ -163,72 +167,90 @@ public class Extractor : MonoBehaviour
         }
     }
 
-    // Resource spawn metodu - strategy'ler taraf�ndan �a�r�lacak
+    // Resource spawn metodu - strategy'ler tarafından çağrılacak
+    // Sadece conveyor belt'i bulur ve Action ile bildirim gönderir, spawn işlemini ConveyorBelt yapar
     public void SpawnResource(GameObject resourcePrefab)
     {
         if (resourcePrefab != null)
         {
-            // Y�ne g�re kontrol pozisyonunu hesapla
+            // Yöne göre kontrol pozisyonunu hesapla
             Vector3 checkPosition = GetCheckPosition();
 
-            // O pozisyonda conveyor belt var m� kontrol et
-            Collider2D conveyorBelt = GetConveyorBeltAtPosition(checkPosition);
+            // DEBUG: Kontrol pozisyonunu yazdır
+            Debug.Log($"🔍 Extractor at: {transform.position}, Direction: {yon}, Check Position: {checkPosition}");
 
-            Vector3 spawnPosition;
+            // O pozisyonda conveyor belt var mı kontrol et
+            Collider2D conveyorBelt = GetConveyorBeltAtPosition(checkPosition);
 
             if (conveyorBelt != null)
             {
-                // Conveyor belt varsa onun �zerinde spawn et
-                spawnPosition = new Vector3(
-                    conveyorBelt.transform.position.x,
-                    conveyorBelt.transform.position.y,
-                    conveyorBelt.transform.position.z - 0.1f
-                );
+                // Conveyor belt bulundu! Action ile bildirim gönder
+                Vector3 targetPosition = conveyorBelt.transform.position;
+                ResourceType resourceType = DetermineResourceType(resourcePrefab);
+
+                // Action'ı tetikle - ConveyorBelt bu bildirimle spawn işlemini yapacak
+                OnResourceSpawned?.Invoke(resourcePrefab, targetPosition, resourceType);
+
+                Debug.Log($"📡 Extractor found conveyor belt! Sending spawn request...");
+                Debug.Log($"📦 Resource Type: {resourceType}, Target Belt Position: {targetPosition}");
+                Debug.Log($"🎯 Extractor: {gameObject.name}, Direction: {yon}");
             }
             else
             {
-                // Conveyor belt yoksa normal pozisyonda spawn et
-                spawnPosition = checkPosition;
-            }
+                // Conveyor belt bulunamadı - DEBUG bilgilerini artır
+                Debug.LogWarning($"⚠️ No conveyor belt found at direction {yon}! Resource not spawned.");
+                Debug.LogWarning($"🔍 Extractor position: {transform.position}");
+                Debug.LogWarning($"🔍 Checked position: {checkPosition}");
+                Debug.LogWarning($"🔍 Search area: {new Vector2(0.5f, 0.5f)}");
 
-            // Resource'� spawn et
-            GameObject spawnedResource = Instantiate(resourcePrefab, spawnPosition, Quaternion.identity);
-
-            // Rigidbody2D ekle
-            Rigidbody2D rb = spawnedResource.GetComponent<Rigidbody2D>();
-            if (rb == null)
-            {
-                rb = spawnedResource.AddComponent<Rigidbody2D>();
+                // Çevredeki tüm collider'ları listele
+                Collider2D[] allColliders = Physics2D.OverlapBoxAll(checkPosition, new Vector2(1f, 1f), 0f);
+                Debug.LogWarning($"🔍 Found {allColliders.Length} colliders in larger area:");
+                foreach (Collider2D col in allColliders)
+                {
+                    Debug.LogWarning($"   - {col.name} (Tag: {col.tag}) at {col.transform.position}");
+                }
             }
-
-            // Conveyor belt �zerindeyse kinematic yap
-            if (conveyorBelt != null)
-            {
-                rb.bodyType = RigidbodyType2D.Kinematic;
-            }
+        }
+        else
+        {
+            Debug.LogError("❌ ResourcePrefab is null! Cannot send spawn request.");
         }
     }
 
-    // Y�ne g�re kontrol edilecek pozisyonu hesapla
+    // Resource tipini prefab'e göre belirle
+    private ResourceType DetermineResourceType(GameObject prefab)
+    {
+        ResourceType resourceType = ResourceType.hamDemir;
+        if (prefab == hamBakirPrefab)
+            resourceType = ResourceType.hamBakir;
+        if (prefab == hamDemirPrefab)
+            resourceType = ResourceType.hamDemir;
+        if (prefab == odunPrefab)
+            resourceType = ResourceType.Wood;
+        return resourceType;
+    }
+
+    // Yöne göre kontrol edilecek pozisyonu hesapla
     private Vector3 GetCheckPosition()
     {
         Vector3 offset = Vector3.zero;
 
         switch (yon)
         {
-            case 0: // Sa�
+            case 0: // Sağ
                 offset = new Vector3(0.75f, 0f, 0f);
                 break;
-            case 1: // Yukar�
+            case 1: // Yukarı
                 offset = new Vector3(0f, 0.75f, 0f);
                 break;
             case 2: // Sol
                 offset = new Vector3(-0.75f, 0f, 0f);
                 break;
-            case 3: // A�a��
+            case 3: // Aşağı
                 offset = new Vector3(0f, -0.75f, 0f);
                 break;
-            default :
+            default:
                 Debug.LogError("Wrong direction input");
                 break;
         }
@@ -236,15 +258,19 @@ public class Extractor : MonoBehaviour
         return transform.position + offset;
     }
 
-    // Belirli pozisyonda conveyor belt var m� kontrol et
+    // Belirli pozisyonda conveyor belt var mı kontrol et
     private Collider2D GetConveyorBeltAtPosition(Vector3 position)
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(position, new Vector2(0.5f, 0.5f), 0f);
 
         foreach (Collider2D collider in colliders)
         {
-            if (collider.CompareTag("ConveyorBelt"))
+            // Tag kontrolü - eğer tag yoksa isim kontrolü yap
+            if (collider.CompareTag("ConveyorBelt") ||
+                collider.name.Contains("ConveyorBelt") ||
+                collider.name.Contains("ConveyorBeltPng"))
             {
+                Debug.Log($"✅ Found conveyor belt: {collider.name} (Tag: {collider.tag})");
                 return collider;
             }
         }
@@ -255,52 +281,11 @@ public class Extractor : MonoBehaviour
     // Trigger based detection alternatifi (2D)
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Bakir"))
-        {
-            SetNewStrategy(new BronzeExtractingStrategy(this, hamBakirPrefab), other.gameObject);
-        }
-        else if (other.CompareTag("Demir"))
-        {
-            SetNewStrategy(new IronExtractingStrategy(this, hamDemirPrefab), other.gameObject);
-        }
-        else if (other.CompareTag("Agac"))
-        {
-            SetNewStrategy(new WoodExtractingStrategy(this, odunPrefab), other.gameObject);
-        }
+        // Bu metod gerekirse kullanılabilir
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject == currentResource)
-        {
-            StopExtraction();
-            extractingStrategy = null;
-            currentResource = null;
-            flag = false;
-        }
-    }
-
-    // Manual strategy set (GameController'dan kullan�labilir)
-    public void SetExtractingStrategy(ExtractingStrategy strategy)
-    {
-        StopExtraction();
-        this.extractingStrategy = strategy;
-        StartExtraction();
-    }
-
-    // Extraction interval'ini de�i�tirmek i�in public metod
-    public void SetExtractionInterval(float newInterval)
-    {
-        extractionInterval = newInterval;
-        // E�er extraction devam ediyorsa, yeni interval ile yeniden ba�lat
-        if (extractingStrategy != null)
-        {
-            StartExtraction();
-        }
-    }
-
-    void OnDestroy()
-    {
-        StopExtraction();
+        // Bu metod gerekirse kullanılabilir
     }
 }

@@ -21,6 +21,8 @@ public class ResourceRequirement
 
 public enum ResourceType
 {
+    hamBakir,
+    hamDemir,
     Wood,
     Plank,
     CopperOre,

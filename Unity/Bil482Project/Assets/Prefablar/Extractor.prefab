@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5107561602799527710}
   m_Layer: 0
   m_Name: "\xE7\u0131kar\u0131c\u0131_0"
-  m_TagString: Untagged
+  m_TagString: Extractor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -153,7 +153,6 @@ MonoBehaviour:
   hamDemirPrefab: {fileID: 5350019042668338052, guid: 5b45d78d9d6e5e04cb8da28e6de09802, type: 3}
   odunPrefab: {fileID: 7601901327307644906, guid: 22a4a42154ab46540aea791fe6348e94, type: 3}
   extractionInterval: 4
-  yon: 0
 --- !u!114 &7068127009400007201
 MonoBehaviour:
   m_ObjectHideFlags: 0
