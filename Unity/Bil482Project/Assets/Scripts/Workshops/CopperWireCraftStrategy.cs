@@ -3,20 +3,15 @@ using UnityEngine;
 public class CopperWireCraftStrategy : IProductionStrategy
 {
     private Workshop workshop;
-    private GameObject copperPrefab;
+    private GameObject copperWirePrefab;
 
-    public CopperWireCraftStrategy(Workshop workshop, GameObject copperPrefab)
-    {
-        this.workshop = workshop;
-        this.copperPrefab = copperPrefab;
+    public int neededAmount { get; set; } = 2;
 
-    }
     public void Produce(GameObject inputResource, Workshop workshop)
     {
-        if (inputResource == copperPrefab)
+        if(inputResource == workshop.bakirIngotPrefab)
         {
-            workshop.SpawnResource(workshop.copperWirePrefab);
-            //Debug.Log("Steel produced from iron");
+            workshop.SpawnResource(copperWirePrefab);
         }
     }
 }

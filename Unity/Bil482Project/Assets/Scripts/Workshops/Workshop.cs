@@ -3,23 +3,64 @@ using UnityEngine.UIElements;
 
 public class Workshop : Machine
 {
-    public enum CraftingRecipe
+    private float craftTimer = 0f;
+    [SerializeField] private float craftingInterval = 4f;
+
+    private IProductionStrategy currentStrategy;
+    private RotatingBuildings rotator;
+    private int yon;
+    private bool isCrafting = false;
+    public int envanter = 0;
+
+    [Header("Input Resource Prefabs")]
+    [SerializeField] public GameObject odunPrefab;
+    [SerializeField] public GameObject bakirIngotPrefab;
+    [SerializeField] public GameObject demirIngotPrefab;
+
+    [Header("Output Resource Prefabs")]
+    [SerializeField] private GameObject plankPrefab;
+    [SerializeField] private GameObject copperWirePrefab;
+    [SerializeField] private GameObject steelPrefab;
+
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
-        Plank,
-        CopperWire,
-        Steel
+        if (GetComponent<BoxCollider2D>() != null)
+        {
+            Debug.LogWarning("Needs empty space");
+        }
+
+        rotator = GetComponent<RotatingBuildings>();
+        if (rotator != null)
+        {
+            yon = rotator.GetTransferYonu();
+        }
     }
 
-    public GameObject plankPrefab;
-    public GameObject odunPrefab;
-    public GameObject copperWirePrefab;
-    public GameObject steelPrefab;
+    void Update()
+    {
+        // Her frame'de pozisyon ve y�n kontrol�
+        if (rotator != null)
+        {
+            yon = rotator.GetTransferYonu();
+        }
 
-    [SerializeField] private float craftingInterval = 4f; // 4 saniyede bir üretim yapacak
-    private RotatingBuildings rotator;
-    private IProductionStrategy currentStrategy;
-    private int yon;
-    private bool flag = false;
+        if (isCrafting)
+        {
+            craftTimer += Time.deltaTime;
+
+            if (craftTimer >= craftingInterval)
+            {
+                isCrafting = false;
+                craftTimer = 0f;
+
+                currentStrategy?.Produce(null, this);
+                envanter -= currentStrategy.neededAmount;
+                Debug.Log("4 saniye sonra üretim gerçekleşti.");
+            }
+        }
+    }
 
     public void SetStrategy(IProductionStrategy strategy)
     {
@@ -28,11 +69,77 @@ public class Workshop : Machine
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Resource"))
+        GameObject incomingResource = collision.gameObject;
+
+        Vector3 expectedEntryDirection = GetExpectedEntryDirection();
+        Vector3 actualDirection = (incomingResource.transform.position - transform.position).normalized;
+
+        if (Vector3.Dot(expectedEntryDirection, actualDirection) < 0.7f) // 1'e yakınsa doğru, < 0.7 yanlış yön
         {
-            //Debug.Log("Bu alana yerleştirilemez ");
+            Debug.Log("Kaynak yanlış yönden geldi, kabul edilmedi.");
+            return;
         }
+
+        // Resource türüne göre stratejiyi belirle
+        if (incomingResource.name.Contains(odunPrefab.name))
+        {
+            if (currentStrategy is PlankCraftStrategy)
+            {
+                Debug.Log("PlankCraftStrategy zaten atandı.");
+                envanter++;
+            }
+            else
+            {
+                envanter = 0;
+                SetStrategy(new PlankCraftStrategy());
+                Debug.Log("Odun geldi, Plank strategy atandı.");
+            }
+        }
+        else if (incomingResource.name.Contains(bakirIngotPrefab.name))
+        {
+            if (currentStrategy is CopperWireCraftStrategy)
+            {
+                Debug.Log("CopperWireCraftStrategy zaten atandı.");
+                envanter++;
+            }
+            else
+            {
+                envanter = 0;
+                SetStrategy(new CopperWireCraftStrategy());
+                Debug.Log("BakirIngot geldi, CopperWire strategy atandı.");
+            }
+        }
+        else if (incomingResource.name.Contains(demirIngotPrefab.name))
+        {
+            if (currentStrategy is SteelCraftStrategy)
+            {
+                Debug.Log("SteelCraftStrategy zaten atandı.");
+                envanter++;
+            }
+            else
+            {
+                envanter = 0;
+                SetStrategy(new SteelCraftStrategy());
+                Debug.Log("DemirIngot geldi, Steel strategy atandı.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Bilinmeyen resource tipi.");
+            return;
+        }
+
+        // Strategy uygulanır
+        if (envanter >= currentStrategy.neededAmount && !isCrafting)
+        {
+            isCrafting = true;
+            craftTimer = 0f;
+            Debug.Log("Üretim için sayaç başlatıldı.");
+        }
+        // Girdi kaynağı yok edilir
+        Destroy(incomingResource);
     }
+
 
     public override void AcceptProduct(GameObject product)
     {
@@ -54,86 +161,22 @@ public class Workshop : Machine
         throw new System.NotImplementedException();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        rotator = GetComponent<RotatingBuildings>();
-        if (rotator != null)
-        {
-            yon = rotator.GetTransferYonu();
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    private void DetermineCraftStrategy(CraftingRecipe selectedRecipe)
-    {
-        switch (selectedRecipe)
-        {
-            case CraftingRecipe.Plank:
-                SetStrategy(new PlankCraftStrategy(this, plankPrefab));
-                Debug.Log("Plank strategy selected");
-                break;
-
-            case CraftingRecipe.CopperWire:
-                SetStrategy(new CopperWireCraftStrategy(this , copperWirePrefab));
-                Debug.Log("Copper wire strategy selected");
-                break;
-
-            case CraftingRecipe.Steel:
-                SetStrategy(new SteelCraftStrategy(this , steelPrefab));
-                Debug.Log("Iron plate strategy selected");
-                break;
-
-            default:
-                Debug.LogWarning("Selected recipe has no strategy implemented.");
-                currentStrategy = null;
-                break;
-        }
-    }
-
     public void SpawnResource(GameObject resourcePrefab)
     {
         if (resourcePrefab != null)
         {
-            // Y�ne g�re kontrol pozisyonunu hesapla
             Vector3 checkPosition = GetCheckPosition();
-
-            // O pozisyonda conveyor belt var m� kontrol et
             Collider2D conveyorBelt = GetConveyorBeltAtPosition(checkPosition);
 
-            Vector3 spawnPosition;
+            Vector3 spawnPosition = conveyorBelt != null
+                ? new Vector3(conveyorBelt.transform.position.x, conveyorBelt.transform.position.y, conveyorBelt.transform.position.z - 0.1f)
+                : checkPosition;
 
-            if (conveyorBelt != null)
-            {
-                // Conveyor belt varsa onun �zerinde spawn et
-                spawnPosition = new Vector3(
-                    conveyorBelt.transform.position.x,
-                    conveyorBelt.transform.position.y,
-                    conveyorBelt.transform.position.z - 0.1f
-                );
-            }
-            else
-            {
-                // Conveyor belt yoksa normal pozisyonda spawn et
-                spawnPosition = checkPosition;
-            }
-
-            // Resource'� spawn et
             GameObject spawnedResource = Instantiate(resourcePrefab, spawnPosition, Quaternion.identity);
 
-            // Rigidbody2D ekle
             Rigidbody2D rb = spawnedResource.GetComponent<Rigidbody2D>();
-            if (rb == null)
-            {
-                rb = spawnedResource.AddComponent<Rigidbody2D>();
-            }
+            if (rb == null) rb = spawnedResource.AddComponent<Rigidbody2D>();
 
-            // Conveyor belt �zerindeyse kinematic yap
             if (conveyorBelt != null)
             {
                 rb.bodyType = RigidbodyType2D.Kinematic;
@@ -180,5 +223,19 @@ public class Workshop : Machine
         }
 
         return null;
+    }
+
+    private Vector3 GetExpectedEntryDirection()
+    {
+        switch (yon)
+        {
+            case 0: return Vector3.left;   // Çıkış sağ → giriş sol
+            case 1: return Vector3.down;   // Çıkış yukarı → giriş aşağı
+            case 2: return Vector3.right;  // Çıkış sol → giriş sağ
+            case 3: return Vector3.up;     // Çıkış aşağı → giriş yukarı
+            default:
+                Debug.LogError("Geçersiz yön");
+                return Vector3.zero;
+        }
     }
 }
