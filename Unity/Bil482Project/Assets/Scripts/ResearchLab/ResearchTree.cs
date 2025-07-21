@@ -468,6 +468,10 @@ public class ResearchTree : MonoBehaviour
 
         return inProgress;
     }
+    public List<ResearchNode> GetAllNodes()
+    {
+        return allNodes;
+    }
 
     // Test için kullanýlacak method
     public void TestResearchFlow()
