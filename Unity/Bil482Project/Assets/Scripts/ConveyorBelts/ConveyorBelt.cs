@@ -4,8 +4,8 @@ using UnityEngine;
 public class ConveyorBelt : MonoBehaviour
 {
     [Header("ConveyorBelt State")]
-    public bool isEmpty = true;  // PUBLIC - Workshop erişebilsin
-    private GameObject resourcePrefab;
+    public bool isEmpty = true;  // PUBLIC - Workshop/Furnace erişebilsin
+    public GameObject resourcePrefab;
     public int giris = 0;
     public int cikis = 0;
 
@@ -14,6 +14,7 @@ public class ConveyorBelt : MonoBehaviour
     private int yon;
     private ConveyorBelt nextConveyorBelt;
     private Workshop targetWorkshop;
+    private Furnace targetFurnace; // FURNACE DESTEĞİ EKLENDİ
 
     [Header("Teleportation Timer")]
     private float teleportTimer = 0f;
@@ -63,7 +64,7 @@ public class ConveyorBelt : MonoBehaviour
     {
         float distance = Vector3.Distance(transform.position, beltPosition);
 
-        if (distance < 0.8f && isEmpty)
+        if (distance < 1f && isEmpty) // Mesafeyi 0.8'den 2.5'e çıkardık
         {
             Vector3 spawnPosition = new Vector3(
                 transform.position.x,
@@ -73,26 +74,19 @@ public class ConveyorBelt : MonoBehaviour
 
             GameObject spawnedResource = Instantiate(resourcePrefab, spawnPosition, Quaternion.identity);
 
-            // Rigidbody2D ekle
-            Rigidbody2D rb = spawnedResource.GetComponent<Rigidbody2D>();
-            if (rb == null)
-            {
-                rb = spawnedResource.AddComponent<Rigidbody2D>();
-            }
-            rb.bodyType = RigidbodyType2D.Kinematic;
-
-            // SpriteRenderer'ı öne al
-            SpriteRenderer sr = spawnedResource.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                sr.sortingOrder = 10;
-            }
-
             this.resourcePrefab = spawnedResource;
             isEmpty = false;
             ResetTeleportTimer();
 
-            Debug.Log($"👁️ Extractor resource {resourcePrefab.name} spawned visibly");
+            Debug.Log($"Resource {resourcePrefab.name} spawned from extractor");
+        }
+        else if (!isEmpty)
+        {
+            Debug.LogWarning($"ConveyorBelt occupied, cannot receive: {resourcePrefab.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"Extractor resource too far: distance = {distance}");
         }
     }
 
@@ -101,10 +95,8 @@ public class ConveyorBelt : MonoBehaviour
     {
         float distance = Vector3.Distance(transform.position, beltPosition);
 
-        if (distance < 2.5f && isEmpty)
+        if (distance < 2.5f && isEmpty) // Mesafeyi 0.8'den 2.5'e çıkardık
         {
-            Debug.Log($"🏭 ConveyorBelt receiving from Workshop: {resourcePrefab.name}");
-
             Vector3 spawnPosition = new Vector3(
                 transform.position.x,
                 transform.position.y,
@@ -113,34 +105,19 @@ public class ConveyorBelt : MonoBehaviour
 
             GameObject spawnedResource = Instantiate(resourcePrefab, spawnPosition, Quaternion.identity);
 
-            // Rigidbody2D ekle
-            Rigidbody2D rb = spawnedResource.GetComponent<Rigidbody2D>();
-            if (rb == null)
-            {
-                rb = spawnedResource.AddComponent<Rigidbody2D>();
-            }
-            rb.bodyType = RigidbodyType2D.Kinematic;
-
-            // SpriteRenderer'ı öne al
-            SpriteRenderer sr = spawnedResource.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                sr.sortingOrder = 10;
-            }
-
             this.resourcePrefab = spawnedResource;
             isEmpty = false;
             ResetTeleportTimer();
 
-            Debug.Log($"✅ Workshop resource {resourcePrefab.name} spawned visibly");
+            Debug.Log($"Workshop resource {resourcePrefab.name} spawned visibly");
         }
         else if (!isEmpty)
         {
-            Debug.LogWarning($"⚠️ ConveyorBelt occupied, cannot receive: {resourcePrefab.name}");
+            Debug.LogWarning($"ConveyorBelt occupied, cannot receive: {resourcePrefab.name}");
         }
         else
         {
-            Debug.LogWarning($"⚠️ Workshop resource too far: distance = {distance}");
+            Debug.LogWarning($"Workshop resource too far: distance = {distance}");
         }
     }
 
@@ -156,7 +133,7 @@ public class ConveyorBelt : MonoBehaviour
                 if (teleportTimer >= teleportDelay)
                 {
                     isReadyToTeleport = true;
-                    Debug.Log($"⏱️ Resource {resourcePrefab.name} ready for teleport after {teleportDelay}s");
+                    Debug.Log($"Resource {resourcePrefab.name} ready for teleport after {teleportDelay}s");
                 }
                 else
                 {
@@ -173,6 +150,10 @@ public class ConveyorBelt : MonoBehaviour
             {
                 TeleportResourceToWorkshop();
             }
+            else if (targetFurnace != null) // FURNACE TELEPORT EKLENDİ
+            {
+                TeleportResourceToFurnace();
+            }
         }
     }
 
@@ -180,7 +161,7 @@ public class ConveyorBelt : MonoBehaviour
     {
         if (nextConveyorBelt != null && nextConveyorBelt.isEmpty && resourcePrefab != null)
         {
-            Debug.Log($"⚡ Teleporting to next belt: {resourcePrefab.name}");
+            Debug.Log($"Teleporting to next belt: {resourcePrefab.name}");
 
             // Physics durdur
             Rigidbody2D rb = resourcePrefab.GetComponent<Rigidbody2D>();
@@ -214,7 +195,7 @@ public class ConveyorBelt : MonoBehaviour
             resourcePrefab = null;
             isEmpty = true;
 
-            Debug.Log("✅ Resource teleported to next belt");
+            Debug.Log("Resource teleported to next belt");
         }
     }
 
@@ -222,7 +203,7 @@ public class ConveyorBelt : MonoBehaviour
     {
         if (targetWorkshop != null && resourcePrefab != null)
         {
-            Debug.Log($"⚡ Teleporting to workshop: {resourcePrefab.name}");
+            Debug.Log($"Teleporting to workshop: {resourcePrefab.name}");
 
             GameObject resourceToTransfer = resourcePrefab;
             resourcePrefab = null;
@@ -271,11 +252,78 @@ public class ConveyorBelt : MonoBehaviour
             try
             {
                 targetWorkshop.SendMessage("OnTriggerEnter2D", resourceCollider, SendMessageOptions.DontRequireReceiver);
-                Debug.Log("✅ Resource teleported to workshop");
+                Debug.Log("Resource teleported to workshop");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"❌ Workshop trigger failed: {e.Message}");
+                Debug.LogError($"Workshop trigger failed: {e.Message}");
+                if (resourceToTransfer != null)
+                {
+                    Destroy(resourceToTransfer);
+                }
+            }
+        }
+    }
+
+    // YENİ METOD - Furnace'a teleport
+    private void TeleportResourceToFurnace()
+    {
+        if (targetFurnace != null && resourcePrefab != null)
+        {
+            Debug.Log($"Teleporting to furnace: {resourcePrefab.name}");
+
+            GameObject resourceToTransfer = resourcePrefab;
+            resourcePrefab = null;
+            isEmpty = true;
+
+            // Physics durdur
+            Rigidbody2D rb = resourceToTransfer.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.bodyType = RigidbodyType2D.Static;
+            }
+
+            // Resource'ı ConveyorBelt'ten geldiğini işaretle
+            TeleportedResource teleportMarker = resourceToTransfer.GetComponent<TeleportedResource>();
+            if (teleportMarker == null)
+            {
+                teleportMarker = resourceToTransfer.AddComponent<TeleportedResource>();
+            }
+            teleportMarker.isTeleportedFromConveyorBelt = true;
+
+            // Furnace'a teleport et
+            resourceToTransfer.transform.position = new Vector3(
+                targetFurnace.transform.position.x,
+                targetFurnace.transform.position.y,
+                targetFurnace.transform.position.z - 1f
+            );
+
+            // SpriteRenderer görünür tut
+            SpriteRenderer sr = resourceToTransfer.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingOrder = 10;
+            }
+
+            // Collider trigger yap
+            Collider2D resourceCollider = resourceToTransfer.GetComponent<Collider2D>();
+            if (resourceCollider == null)
+            {
+                resourceCollider = resourceToTransfer.AddComponent<BoxCollider2D>();
+            }
+            resourceCollider.isTrigger = true;
+
+            // Furnace trigger'ını çağır
+            try
+            {
+                targetFurnace.SendMessage("OnTriggerEnter2D", resourceCollider, SendMessageOptions.DontRequireReceiver);
+                Debug.Log("Resource teleported to furnace");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Furnace trigger failed: {e.Message}");
                 if (resourceToTransfer != null)
                 {
                     Destroy(resourceToTransfer);
@@ -288,7 +336,7 @@ public class ConveyorBelt : MonoBehaviour
     {
         teleportTimer = 0f;
         isReadyToTeleport = false;
-        Debug.Log($"⏱️ Timer reset - will wait {teleportDelay}s before moving");
+        Debug.Log($"Timer reset - will wait {teleportDelay}s before moving");
     }
 
     private static readonly Vector2Int[] directionOffsets = new Vector2Int[]
@@ -312,6 +360,7 @@ public class ConveyorBelt : MonoBehaviour
             {
                 nextConveyorBelt = belt;
                 targetWorkshop = null;
+                targetFurnace = null; // FURNACE NULL YAP
                 if (flag3)
                 {
                     Debug.Log("Next conveyor belt found");
@@ -328,6 +377,7 @@ public class ConveyorBelt : MonoBehaviour
                 {
                     targetWorkshop = workshop;
                     nextConveyorBelt = null;
+                    targetFurnace = null; // FURNACE NULL YAP
                     if (flag3)
                     {
                         Debug.Log("Target workshop found");
@@ -339,12 +389,32 @@ public class ConveyorBelt : MonoBehaviour
                 }
                 else
                 {
-                    nextConveyorBelt = null;
-                    targetWorkshop = null;
-                    if (flag1 && flag4)
+                    // FURNACE KONTROLÜ EKLENDİ
+                    Furnace furnace = hit.GetComponent<Furnace>();
+                    if (furnace != null)
                     {
-                        Debug.Log("No next target found");
-                        flag1 = false;
+                        targetFurnace = furnace;
+                        nextConveyorBelt = null;
+                        targetWorkshop = null;
+                        if (flag3)
+                        {
+                            Debug.Log("Target furnace found");
+                            flag3 = false;
+                            flag4 = false;
+                        }
+                        flag1 = true;
+                        flag2 = true;
+                    }
+                    else
+                    {
+                        nextConveyorBelt = null;
+                        targetWorkshop = null;
+                        targetFurnace = null; // FURNACE NULL YAP
+                        if (flag1 && flag4)
+                        {
+                            Debug.Log("No next target found");
+                            flag1 = false;
+                        }
                     }
                 }
             }
@@ -353,6 +423,7 @@ public class ConveyorBelt : MonoBehaviour
         {
             nextConveyorBelt = null;
             targetWorkshop = null;
+            targetFurnace = null; // FURNACE NULL YAP
             if (flag2)
             {
                 flag2 = false;
@@ -364,7 +435,7 @@ public class ConveyorBelt : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // Manuel resource yerleştirme için
-        if (isEmpty && !collision.CompareTag("Extractor") && !collision.CompareTag("Workshop"))
+        if (isEmpty && !collision.CompareTag("Extractor") && !collision.CompareTag("Workshop") && !collision.CompareTag("Furnace"))
         {
             resourcePrefab = collision.gameObject;
             isEmpty = false;

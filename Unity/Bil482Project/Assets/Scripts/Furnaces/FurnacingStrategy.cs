@@ -2,5 +2,6 @@ using UnityEngine;
 
 public interface FurnacingStrategy 
 {
-    void furnace(); 
+    int neededAmount { get; set; }
+    void furnace(GameObject inputResource, Furnace furnace); 
 }

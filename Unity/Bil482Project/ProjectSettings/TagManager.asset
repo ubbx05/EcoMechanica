@@ -24,6 +24,7 @@ TagManager:
   - BakirTel
   - DemirDisli
   - ResearchLab
+  - Steel
   layers:
   - Default
   - TransparentFX

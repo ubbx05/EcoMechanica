@@ -1,22 +1,14 @@
 using UnityEngine;
 
-public class IronFurnacing : FurnacingStrategy
+public class IronFurnacingStrategy : FurnacingStrategy
 {
-    private Furnace Furnace;
-    private GameObject Ironore;
+    public int neededAmount { get; set; } = 2;
 
-    public IronFurnacing(GameObject Ironore , Furnace furnace)
+    public void furnace(GameObject inputResource, Furnace furnace)
     {
-        this.Ironore =Ironore;
-        this.Furnace = furnace;
-        if (Ironore == null)
-        {
-            //Debug.LogError("Ironore prefab is not assigned!");
-        }
-    }
-
-    public void furnace()
-    {
-        //gelecek
+        // Input resource artýk null - furnace inventory'den çalýþýyor
+        // Doðrudan furnace'ýn ironore_prefab'ýný kullan
+        furnace.SpawnResource(furnace.ironore_prefab);
+        Debug.Log("Iron Bar crafted and sent to conveyor belt!");
     }
 }
