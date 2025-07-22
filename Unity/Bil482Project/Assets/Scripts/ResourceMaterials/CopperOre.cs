@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class HamBakir : Resource
+public class CopperOre : Resource
 {
     protected override void InitializeResource()
     {
-        resourceName = "HamBakir";
+        resourceName = "CopperOre";
         resourceType = ResourceType.CopperOre;
         resourceIncome = 1;
     }
@@ -12,8 +12,9 @@ public class HamBakir : Resource
     /*
     private void Awake()
     {
-        resourceType = "HamBakir";
+        resourceType = "CopperOre";
         resourceIncome = 1;
     }
     */
 }
+

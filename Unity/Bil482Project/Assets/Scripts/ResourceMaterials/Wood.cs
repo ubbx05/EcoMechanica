@@ -1,10 +1,11 @@
 using UnityEngine;
 
-public class Odun : Resource
+
+public class Wood : Resource
 {
     protected override void InitializeResource()
     {
-        resourceName = "Odun";
+        resourceName = "Wood";
         resourceType = ResourceType.Wood;
         resourceIncome = 1;
     }
@@ -12,7 +13,7 @@ public class Odun : Resource
     /*
     void Awake()
     {
-        resourceType = "Odun";
+        resourceType = "Wood";
         resourceIncome = 1; 
     }
     */

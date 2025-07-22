@@ -1,20 +1,20 @@
 using UnityEngine;
 
-public class HamDemir : Resource
+public class IronOre : Resource
 {
     protected override void InitializeResource()
     {
-        resourceName = "HamDemir";
+        resourceName = "IronOre";
         resourceType = ResourceType.IronOre;
         resourceIncome = 1;
     }
-    
+
     /*
-    void Awake()
+    private void Awake()
     {
-        resourceType = "HamDemir";
+        resourceType = "IronOre";
         resourceIncome = 1;
     }
     */
-
 }
+
