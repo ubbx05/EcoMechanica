@@ -3,14 +3,24 @@ using UnityEngine;
 
 public class ConveyorBelt : MonoBehaviour
 {
-    Boolean isEmpty = true;  // Başlangıçta boş olmalı
+    [Header("ConveyorBelt State")]
+    public bool isEmpty = true;  // PUBLIC - Workshop erişebilsin
     private GameObject resourcePrefab;
     public int giris = 0;
     public int cikis = 0;
-    private float speed = 1.5f;  // Hareket hızını artırdık
+
+    [Header("ConveyorBelt Settings")]
     private RotatingBuildings rotator;
     private int yon;
     private ConveyorBelt nextConveyorBelt;
+    private Workshop targetWorkshop;
+
+    [Header("Teleportation Timer")]
+    private float teleportTimer = 0f;
+    private float teleportDelay = 2f; // 2 saniye bekleme
+    private bool isReadyToTeleport = false;
+
+    // Debug flags
     bool flag1 = true;
     bool flag2 = true;
     bool flag3 = true;
@@ -18,10 +28,11 @@ public class ConveyorBelt : MonoBehaviour
 
     void Start()
     {
-        // Belt'i kesinlikle boş yap
+        // Belt'i boş yap
         isEmpty = true;
         resourcePrefab = null;
 
+        // Bileşenleri al
         determineNextConveyorBelt();
         if (rotator == null)
         {
@@ -29,36 +40,40 @@ public class ConveyorBelt : MonoBehaviour
         }
         yon = rotator.transferyonu;
 
-        // Extractor'dan gelen Resource Type Action'ını dinle
+        // Action'ları dinle
         Extractor.OnResourceSpawned += HandleResourceSpawned;
+        Workshop.OnWorkshopResourceSpawned += HandleWorkshopResourceSpawned;
     }
 
     void OnDestroy()
     {
-        // Memory leak'i önlemek için Action'dan aboneliği kaldır
+        // Memory leak önleme
         Extractor.OnResourceSpawned -= HandleResourceSpawned;
+        Workshop.OnWorkshopResourceSpawned -= HandleWorkshopResourceSpawned;
     }
 
-    // Extractor'dan gelen resource spawn bildirimini resource type bilgisi ile işle
+    void Update()
+    {
+        determineNextConveyorBelt();
+        transportingRes();
+    }
+
+    // Extractor'dan gelen resource'ları işle
     private void HandleResourceSpawned(GameObject resourcePrefab, Vector3 beltPosition, ResourceType resourceType)
     {
-        // Bu conveyor belt'in üzerinde mi spawn olacak kontrol et
         float distance = Vector3.Distance(transform.position, beltPosition);
 
-        // Tolerance mesafesi içinde ve belt boşsa resource'ı spawn et
         if (distance < 0.8f && isEmpty)
         {
-            // ConveyorBelt kendisi spawn yapıyor
             Vector3 spawnPosition = new Vector3(
                 transform.position.x,
                 transform.position.y,
-                transform.position.z - 0.1f
+                transform.position.z - 1f  // Görünür olması için
             );
 
-            // Resource'ı spawn et
             GameObject spawnedResource = Instantiate(resourcePrefab, spawnPosition, Quaternion.identity);
 
-            // Rigidbody2D ekle ve kinematic yap
+            // Rigidbody2D ekle
             Rigidbody2D rb = spawnedResource.GetComponent<Rigidbody2D>();
             if (rb == null)
             {
@@ -66,27 +81,214 @@ public class ConveyorBelt : MonoBehaviour
             }
             rb.bodyType = RigidbodyType2D.Kinematic;
 
-            // Resource'ı belt'e ata ve belt'i dolu yap
-            this.resourcePrefab = spawnedResource;  // Spawn edilen objeyi ata, parametre olarak gelen prefab'ı değil!
-            isEmpty = false;
+            // SpriteRenderer'ı öne al
+            SpriteRenderer sr = spawnedResource.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingOrder = 10;
+            }
 
-            // Resource tipine göre özel işlemler
-            HandleSpecificResourceType(resourceType, spawnedResource);
+            this.resourcePrefab = spawnedResource;
+            isEmpty = false;
+            ResetTeleportTimer();
+
+            Debug.Log($"👁️ Extractor resource {resourcePrefab.name} spawned visibly");
         }
     }
 
-    // Resource tipine göre özel işlemler
-    private void HandleSpecificResourceType(ResourceType resourceType, GameObject resource)
+    // Workshop'tan gelen resource'ları işle
+    private void HandleWorkshopResourceSpawned(GameObject resourcePrefab, Vector3 beltPosition, ResourceType resourceType)
     {
-        // Gelecekte resource tipine göre özel işlemler buraya eklenebilir
-        // Örnek: ses efektleri, partikel efektleri, sayaçlar vb.
+        float distance = Vector3.Distance(transform.position, beltPosition);
+
+        if (distance < 2.5f && isEmpty)
+        {
+            Debug.Log($"🏭 ConveyorBelt receiving from Workshop: {resourcePrefab.name}");
+
+            Vector3 spawnPosition = new Vector3(
+                transform.position.x,
+                transform.position.y,
+                transform.position.z - 1f  // Görünür olması için
+            );
+
+            GameObject spawnedResource = Instantiate(resourcePrefab, spawnPosition, Quaternion.identity);
+
+            // Rigidbody2D ekle
+            Rigidbody2D rb = spawnedResource.GetComponent<Rigidbody2D>();
+            if (rb == null)
+            {
+                rb = spawnedResource.AddComponent<Rigidbody2D>();
+            }
+            rb.bodyType = RigidbodyType2D.Kinematic;
+
+            // SpriteRenderer'ı öne al
+            SpriteRenderer sr = spawnedResource.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingOrder = 10;
+            }
+
+            this.resourcePrefab = spawnedResource;
+            isEmpty = false;
+            ResetTeleportTimer();
+
+            Debug.Log($"✅ Workshop resource {resourcePrefab.name} spawned visibly");
+        }
+        else if (!isEmpty)
+        {
+            Debug.LogWarning($"⚠️ ConveyorBelt occupied, cannot receive: {resourcePrefab.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ Workshop resource too far: distance = {distance}");
+        }
     }
 
-    // Update is called once per frame  
-    void Update()
+    public void transportingRes()
     {
-        determineNextConveyorBelt();
-        transportingRes();
+        if (resourcePrefab != null && !isEmpty)
+        {
+            // Timer kontrolü - 2 saniye bekleme
+            teleportTimer += Time.deltaTime;
+
+            if (!isReadyToTeleport)
+            {
+                if (teleportTimer >= teleportDelay)
+                {
+                    isReadyToTeleport = true;
+                    Debug.Log($"⏱️ Resource {resourcePrefab.name} ready for teleport after {teleportDelay}s");
+                }
+                else
+                {
+                    return; // Henüz hazır değil
+                }
+            }
+
+            // Teleport hazır, hedef kontrol et
+            if (nextConveyorBelt != null && nextConveyorBelt.isEmpty)
+            {
+                TeleportResourceToNextBelt();
+            }
+            else if (targetWorkshop != null)
+            {
+                TeleportResourceToWorkshop();
+            }
+        }
+    }
+
+    private void TeleportResourceToNextBelt()
+    {
+        if (nextConveyorBelt != null && nextConveyorBelt.isEmpty && resourcePrefab != null)
+        {
+            Debug.Log($"⚡ Teleporting to next belt: {resourcePrefab.name}");
+
+            // Physics durdur
+            Rigidbody2D rb = resourcePrefab.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.bodyType = RigidbodyType2D.Kinematic;
+            }
+
+            // Teleport et
+            resourcePrefab.transform.position = new Vector3(
+                nextConveyorBelt.transform.position.x,
+                nextConveyorBelt.transform.position.y,
+                nextConveyorBelt.transform.position.z - 1f
+            );
+
+            // SpriteRenderer görünür tut
+            SpriteRenderer sr = resourcePrefab.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingOrder = 10;
+            }
+
+            // Transfer et
+            nextConveyorBelt.resourcePrefab = resourcePrefab;
+            nextConveyorBelt.isEmpty = false;
+            nextConveyorBelt.ResetTeleportTimer();
+
+            // Bu belt'i boşalt
+            resourcePrefab = null;
+            isEmpty = true;
+
+            Debug.Log("✅ Resource teleported to next belt");
+        }
+    }
+
+    private void TeleportResourceToWorkshop()
+    {
+        if (targetWorkshop != null && resourcePrefab != null)
+        {
+            Debug.Log($"⚡ Teleporting to workshop: {resourcePrefab.name}");
+
+            GameObject resourceToTransfer = resourcePrefab;
+            resourcePrefab = null;
+            isEmpty = true;
+
+            // Physics durdur
+            Rigidbody2D rb = resourceToTransfer.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.bodyType = RigidbodyType2D.Static;
+            }
+
+            // Resource'ı ConveyorBelt'ten geldiğini işaretle
+            TeleportedResource teleportMarker = resourceToTransfer.GetComponent<TeleportedResource>();
+            if (teleportMarker == null)
+            {
+                teleportMarker = resourceToTransfer.AddComponent<TeleportedResource>();
+            }
+            teleportMarker.isTeleportedFromConveyorBelt = true;
+
+            // Workshop'a teleport et
+            resourceToTransfer.transform.position = new Vector3(
+                targetWorkshop.transform.position.x,
+                targetWorkshop.transform.position.y,
+                targetWorkshop.transform.position.z - 1f
+            );
+
+            // SpriteRenderer görünür tut
+            SpriteRenderer sr = resourceToTransfer.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingOrder = 10;
+            }
+
+            // Collider trigger yap
+            Collider2D resourceCollider = resourceToTransfer.GetComponent<Collider2D>();
+            if (resourceCollider == null)
+            {
+                resourceCollider = resourceToTransfer.AddComponent<BoxCollider2D>();
+            }
+            resourceCollider.isTrigger = true;
+
+            // Workshop trigger'ını çağır
+            try
+            {
+                targetWorkshop.SendMessage("OnTriggerEnter2D", resourceCollider, SendMessageOptions.DontRequireReceiver);
+                Debug.Log("✅ Resource teleported to workshop");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ Workshop trigger failed: {e.Message}");
+                if (resourceToTransfer != null)
+                {
+                    Destroy(resourceToTransfer);
+                }
+            }
+        }
+    }
+
+    public void ResetTeleportTimer()
+    {
+        teleportTimer = 0f;
+        isReadyToTeleport = false;
+        Debug.Log($"⏱️ Timer reset - will wait {teleportDelay}s before moving");
     }
 
     private static readonly Vector2Int[] directionOffsets = new Vector2Int[]
@@ -109,7 +311,8 @@ public class ConveyorBelt : MonoBehaviour
             if (belt != null)
             {
                 nextConveyorBelt = belt;
-                if (flag3 == true)
+                targetWorkshop = null;
+                if (flag3)
                 {
                     Debug.Log("Next conveyor belt found");
                     flag3 = false;
@@ -120,149 +323,57 @@ public class ConveyorBelt : MonoBehaviour
             }
             else
             {
-                if (flag1 == true && flag4 == true)
+                Workshop workshop = hit.GetComponent<Workshop>();
+                if (workshop != null)
                 {
-                    Debug.Log("diger belt bulunamadi");
-                    flag1 = false;
+                    targetWorkshop = workshop;
+                    nextConveyorBelt = null;
+                    if (flag3)
+                    {
+                        Debug.Log("Target workshop found");
+                        flag3 = false;
+                        flag4 = false;
+                    }
+                    flag1 = true;
+                    flag2 = true;
+                }
+                else
+                {
+                    nextConveyorBelt = null;
+                    targetWorkshop = null;
+                    if (flag1 && flag4)
+                    {
+                        Debug.Log("No next target found");
+                        flag1 = false;
+                    }
                 }
             }
         }
         else
         {
-            if (flag2 == true)
+            nextConveyorBelt = null;
+            targetWorkshop = null;
+            if (flag2)
             {
                 flag2 = false;
-                Debug.Log("diger hit bulunamadi");
+                Debug.Log("No hit found");
             }
-        }
-    }
-
-    public void transportingRes()
-    {
-        // Belt boş değilse ve resource varsa hareket ettir
-        if (!isEmpty && resourcePrefab != null)
-        {
-            // Yön kontrolü - rotator varsa yönü güncelle
-            if (rotator != null)
-            {
-                yon = rotator.transferyonu;
-            }
-
-            // Rigidbody2D ile fizik tabanlı hareket
-            Rigidbody2D rb = resourcePrefab.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                // Hareket yönünü hesapla
-                Vector2 moveDirection = Vector2.zero;
-                switch (yon)
-                {
-                    case 0: // Sağ
-                        moveDirection = Vector2.right;
-                        break;
-                    case 1: // Yukarı
-                        moveDirection = Vector2.up;
-                        break;
-                    case 2: // Sol
-                        moveDirection = Vector2.left;
-                        break;
-                    case 3: // Aşağı
-                        moveDirection = Vector2.down;
-                        break;
-                }
-
-                // Hedef pozisyonda ConveyorBelt var mı kontrol et
-                Vector3 targetPos = resourcePrefab.transform.position + (Vector3)(moveDirection * speed * Time.deltaTime);
-
-                if (IsConveyorBeltAtPosition(targetPos))
-                {
-                    // Fizik tabanlı hareket - linearVelocity kullan (Unity 2023+)
-                    rb.linearVelocity = moveDirection * speed;
-                }
-                else
-                {
-                    // Hedef pozisyonda conveyor belt yoksa dur
-                    rb.linearVelocity = Vector2.zero;
-
-                    // Sonraki belt'e transfer dene
-                    if (nextConveyorBelt != null && nextConveyorBelt.isEmpty)
-                    {
-                        float distanceFromCenter = Vector3.Distance(resourcePrefab.transform.position, transform.position);
-                        if (distanceFromCenter > 0.4f)
-                        {
-                            TransferResourceToNextBelt();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Belirli pozisyonda ConveyorBelt var mı kontrol et
-    private bool IsConveyorBeltAtPosition(Vector3 position)
-    {
-        Collider2D[] colliders = Physics2D.OverlapPointAll(position);
-
-        foreach (Collider2D collider in colliders)
-        {
-            // ConveyorBelt tag'i veya ismi kontrolü
-            if (collider.CompareTag("ConveyorBelt") ||
-                collider.name.Contains("ConveyorBelt") ||
-                collider.name.Contains("ConveyorBeltPng"))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void CheckTransferToNextBelt()
-    {
-        // Bu fonksiyon artık transportingRes() içinde kullanılıyor
-        // Ayrı çağrılmasına gerek yok
-    }
-
-    private void TransferResourceToNextBelt()
-    {
-        if (nextConveyorBelt != null && nextConveyorBelt.isEmpty && resourcePrefab != null)
-        {
-            // Resource'ın linearVelocity'sini sıfırla
-            Rigidbody2D rb = resourcePrefab.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector2.zero;
-            }
-
-            // Resource'ı sonraki belt'e transfer et
-            nextConveyorBelt.resourcePrefab = resourcePrefab;
-            nextConveyorBelt.isEmpty = false;
-
-            // Resource'ın pozisyonunu sonraki belt'in merkezine ayarla
-            resourcePrefab.transform.position = new Vector3(
-                nextConveyorBelt.transform.position.x,
-                nextConveyorBelt.transform.position.y,
-                nextConveyorBelt.transform.position.z - 0.1f
-            );
-
-            // Bu belt'i boşalt
-            resourcePrefab = null;
-            isEmpty = true;
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Bu metod artık sadece manuel resource yerleştirme için kullanılacak
-        // Extractor'dan gelen resource'lar Action ile yönetiliyor
-        if (isEmpty && !collision.CompareTag("Extractor"))
+        // Manuel resource yerleştirme için
+        if (isEmpty && !collision.CompareTag("Extractor") && !collision.CompareTag("Workshop"))
         {
             resourcePrefab = collision.gameObject;
             isEmpty = false;
-            Debug.Log("Resource manually added to conveyor belt: " + resourcePrefab.name);
+            ResetTeleportTimer();
+            Debug.Log("Resource manually added: " + resourcePrefab.name);
         }
         else if (!isEmpty)
         {
-            Debug.LogWarning("Conveyor belt is already occupied by another resource.");
+            Debug.LogWarning("ConveyorBelt already occupied");
         }
     }
 }

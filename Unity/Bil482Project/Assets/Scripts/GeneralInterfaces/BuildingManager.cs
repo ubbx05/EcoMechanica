@@ -88,13 +88,15 @@ public class BuildingManager : MonoBehaviour
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    // WorldToTile metoduyla koordinat bul
                     Vector2Int tilePos = TileManager.Instance.WorldToTile(placePos);
 
                     if (!TileManager.Instance.IsOccupied(tilePos))
                     {
-                        Instantiate(SelectedPrefab, placePos, previewInstance.transform.rotation);
+                        GameObject instantiatedBuilding = Instantiate(SelectedPrefab, placePos, previewInstance.transform.rotation);
                         TileManager.Instance.MarkOccupied(tilePos);
+
+                        // ACTION'LARI TETÝKLE!
+                        TriggerPlacementAction(instantiatedBuilding, SelectedTier);
 
                         Destroy(previewInstance);
                         previewInstance = null;
@@ -108,7 +110,32 @@ public class BuildingManager : MonoBehaviour
             }
         }
     }
-
+    private void TriggerPlacementAction(GameObject building, int tier)
+    {
+        // Building türünü tag'e veya component'e göre belirle
+        if (building.CompareTag("Extractor") || building.GetComponent<Extractor>() != null)
+        {
+            OnExtractorPlaced?.Invoke(tier);
+        }
+        else if (building.CompareTag("Fabrika") || building.GetComponent<Assembler>() != null)
+        {
+            OnAssemblerPlaced?.Invoke(tier);
+        }
+        else if (building.CompareTag("Cleaner") || building.GetComponent<Cleaner>() != null)
+        {
+            OnCleanerPlaced?.Invoke(tier);
+        }
+        else if(building.CompareTag("Furnace") || building.GetComponent<Furnace>() != null)
+        {
+            OnFurnacePlaced?.Invoke(tier);
+        }
+        else if(building.CompareTag("Atolye") || building.GetComponent<Workshop>() != null)
+        {
+            OnWorkshopPlaced?.Invoke(tier);
+        }
+        
+        // Diðer building türleri için de ekleyebilirsin
+    }
     public void SetSelectedPrefab(GameObject prefab)
     {
         SelectedPrefab = prefab;

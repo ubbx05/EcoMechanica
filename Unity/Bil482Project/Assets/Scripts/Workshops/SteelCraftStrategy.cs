@@ -2,19 +2,13 @@ using UnityEngine;
 
 public class SteelCraftStrategy : IProductionStrategy
 {
-    private Workshop workshop;
-    private GameObject steelPrefab;
-
     public int neededAmount { get; set; } = 2;
-   
+
     public void Produce(GameObject inputResource, Workshop workshop)
     {
-        if(inputResource == workshop.demirIngotPrefab)
-        {
-            workshop.SpawnResource(steelPrefab);
-        }
-        
+        // Input resource artýk null - workshop inventory'den çalýþýyor
+        // Doðrudan workshop'un steelPrefab'ýný kullan
+        workshop.SpawnResource(workshop.steelPrefab);
+        Debug.Log("Steel crafted and sent to conveyor belt!");
     }
-
-    
 }

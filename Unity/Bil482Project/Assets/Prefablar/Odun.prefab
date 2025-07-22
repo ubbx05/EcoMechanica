@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 2165011796049658229}
   - component: {fileID: 6504351574862042953}
   - component: {fileID: 8861253476786557077}
+  - component: {fileID: 8479861166523374915}
   m_Layer: 0
   m_Name: odun_0
   m_TagString: Odun
@@ -166,3 +167,17 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.18, y: 0.22}
   m_EdgeRadius: 0
+--- !u!114 &8479861166523374915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8150034324292156815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c664a1ed6957a44eaf6af1f9ecfd19c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceType: Odun
+  resourceIncome: 1
