@@ -129,7 +129,7 @@ public class ConveyorBelt : MonoBehaviour
     {
         float distance = Vector3.Distance(transform.position, beltPosition);
 
-        if (distance < 2.5f && isEmpty) // Workshop ile aynı mesafe
+        if (distance < 0.8f && isEmpty) // Workshop ile aynı mesafe
         {
             Vector3 spawnPosition = new Vector3(
                 transform.position.x,

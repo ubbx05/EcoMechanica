@@ -202,6 +202,7 @@ MonoBehaviour:
   plankPrefab: {fileID: 211247455376816364, guid: af2576669d63c3643b25d9deb419b0cc, type: 3}
   copperWirePrefab: {fileID: 1850708246136181955, guid: e56cbb869217c754bbe00a6ed53e3e60, type: 3}
   steelPrefab: {fileID: 8428806378333227423, guid: 40616761d81c34e41959d77883052b82, type: 3}
+  magnetPrefab: {fileID: 7483527858364429034, guid: 2a4863c74bd942e4991365e611e7d3cb, type: 3}
 --- !u!114 &1549793213873594130
 MonoBehaviour:
   m_ObjectHideFlags: 0

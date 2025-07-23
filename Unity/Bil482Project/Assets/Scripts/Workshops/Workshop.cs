@@ -22,6 +22,7 @@ public class Workshop : Machine
     [SerializeField] public GameObject plankPrefab;
     [SerializeField] public GameObject copperWirePrefab;
     [SerializeField] public GameObject steelPrefab;
+    [SerializeField] public GameObject magnetPrefab;
 
     [Header("Workshop Output Buffer")]
     public Queue<GameObject> outputBuffer = new Queue<GameObject>();
@@ -38,6 +39,9 @@ public class Workshop : Machine
         {
             yon = rotator.GetTransferYonu();
         }
+
+        // Her Workshop'a unique ID ver
+        Debug.Log($"🏭 Workshop {gameObject.name} started with ID: {GetInstanceID()}");
     }
 
     void Update()
@@ -60,6 +64,7 @@ public class Workshop : Machine
 
                 Debug.Log($"⏰ Workshop production completed! Strategy: {currentStrategy?.GetType().Name}");
                 Debug.Log($"📦 Envanter before production: {envanter}");
+                Debug.Log($"📦 Buffer size before production: {outputBuffer.Count}");
 
                 // Üretimi yap - ürünü buffer'a ekle
                 currentStrategy?.Produce(null, this);
@@ -68,6 +73,7 @@ public class Workshop : Machine
                 envanter -= currentStrategy.neededAmount;
 
                 Debug.Log($"📦 Envanter after production: {envanter}");
+                Debug.Log($"📦 Buffer size after production: {outputBuffer.Count}");
                 Debug.Log("✅ Production cycle finished");
             }
         }
@@ -83,7 +89,9 @@ public class Workshop : Machine
 
     public void SetStrategy(IProductionStrategy strategy)
     {
+        Debug.Log($"🔧 SetStrategy called with: {strategy?.GetType().Name ?? "NULL"}");
         currentStrategy = strategy;
+        Debug.Log($"🔧 Strategy set successfully: {currentStrategy?.GetType().Name ?? "NULL"}");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -94,7 +102,8 @@ public class Workshop : Machine
         }
 
         GameObject incomingResource = collision.gameObject;
-        Debug.Log($"🎯 Workshop received: {incomingResource.name}");
+        Debug.Log($"🎯 Workshop {gameObject.name} (ID: {GetInstanceID()}) received: {incomingResource.name}");
+        Debug.Log($"🎯 Current envanter: {envanter}");
 
         // ConveyorBelt'ten teleport edilen resource'lar için özel kontrol
         TeleportedResource teleportMarker = incomingResource.GetComponent<TeleportedResource>();
@@ -135,7 +144,7 @@ public class Workshop : Machine
                 Debug.Log("🪵 Wood strategy set");
             }
         }
-        else if (incomingResource.name.Contains("Bakir") || incomingResource.name.Contains("Copper") || incomingResource.name.Contains("HamBakir"))
+        else if (incomingResource.CompareTag("BakirIngot") || incomingResource.name.Contains("Copper"))
         {
             resourceAccepted = true;
             if (currentStrategy is CopperWireCraftStrategy)
@@ -150,7 +159,7 @@ public class Workshop : Machine
                 Debug.Log("🔩 Copper strategy set");
             }
         }
-        else if (incomingResource.name.Contains("Demir") || incomingResource.name.Contains("Iron") || incomingResource.name.Contains("HamDemir"))
+        else if (incomingResource.CompareTag("DemirIngot") || incomingResource.name.Contains("Iron"))
         {
             resourceAccepted = true;
             if (currentStrategy is SteelCraftStrategy)
@@ -163,6 +172,27 @@ public class Workshop : Machine
                 envanter = 1;
                 SetStrategy(new SteelCraftStrategy());
                 Debug.Log("⛏️ Steel strategy set");
+            }
+        }
+        else if (incomingResource.CompareTag("BakirTel") ||
+                 incomingResource.name.Contains("BakirTel") ||
+                 incomingResource.name.Contains("CopperWire"))
+        {
+            Debug.Log($"🔍 BakirTel detected! Tag: {incomingResource.tag}, Name: {incomingResource.name}");
+            Debug.Log($"🔍 Current strategy: {currentStrategy?.GetType().Name ?? "NULL"}");
+
+            resourceAccepted = true;
+            if (currentStrategy is MagnetCraftingStrategy)
+            {
+                envanter++;
+                Debug.Log($"🧲 Copper wire added to inventory. Total: {envanter}");
+            }
+            else
+            {
+                Debug.Log("🔄 Setting new MagnetCraftingStrategy...");
+                envanter = 1;
+                SetStrategy(new MagnetCraftingStrategy());
+                Debug.Log($"🧲 Magnet strategy set! New strategy: {currentStrategy?.GetType().Name}");
             }
         }
 
@@ -209,6 +239,7 @@ public class Workshop : Machine
     public void SpawnResource(GameObject resourcePrefab)
     {
         Debug.Log($"🏭 Workshop.SpawnResource called with: {resourcePrefab?.name ?? "NULL"}");
+        Debug.Log($"🏭 Current buffer size before adding: {outputBuffer.Count}");
 
         if (resourcePrefab != null)
         {
@@ -266,9 +297,11 @@ public class Workshop : Machine
         if (prefab == plankPrefab)
             return ResourceType.Wood;
         else if (prefab == copperWirePrefab)
-            return ResourceType.hamBakir;
+            return ResourceType.CopperWire;
         else if (prefab == steelPrefab)
             return ResourceType.hamDemir;
+        else if (prefab == magnetPrefab)
+            return ResourceType.Magnet;
 
         return ResourceType.hamDemir;
     }

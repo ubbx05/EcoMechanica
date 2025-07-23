@@ -132,7 +132,7 @@ public class Assembler : MonoBehaviour
         bool resourceAccepted = false;
 
         // Resource türüne göre stratejiyi belirle ve envantere ekle - Workshop'taki gibi
-        if (incomingResource.name.Contains("DemirIngot") || incomingResource.name.Contains("IronIngot") || incomingResource.name.Contains("Iron"))
+        if (incomingResource.CompareTag("DemirIngot") || incomingResource.name.Contains("IronIngot") || incomingResource.name.Contains("Iron"))
         {
             resourceAccepted = true;
             if (currentStrategy is CircuitBoardAssembleStrategy)
@@ -148,7 +148,7 @@ public class Assembler : MonoBehaviour
                 Debug.Log($"Strategy set to CircuitBoard production. DemirIngot added: {productA_envanter}");
             }
         }
-        else if (incomingResource.name.Contains("Magnet") || incomingResource.name.Contains("Mıknatıs"))
+        else if (incomingResource.CompareTag("Magnet") || incomingResource.name.Contains("Mıknatıs"))
         {
             resourceAccepted = true;
             if (currentStrategy is CircuitBoardAssembleStrategy)
@@ -164,7 +164,7 @@ public class Assembler : MonoBehaviour
                 Debug.Log($"Strategy set to CircuitBoard production. Magnet added: {productB_envanter}");
             }
         }
-        else if (incomingResource.name.Contains("CircuitBoard") || incomingResource.name.Contains("Devre"))
+        else if (incomingResource.CompareTag("CircuitBoard") || incomingResource.name.Contains("Devre"))
         {
             resourceAccepted = true;
             if (currentStrategy is ComputerAssembleStrategy)
@@ -180,7 +180,7 @@ public class Assembler : MonoBehaviour
                 Debug.Log($"Strategy set to Computer production. CircuitBoard added: {productA_envanter}");
             }
         }
-        else if (incomingResource.name.Contains("Steel") || incomingResource.name.Contains("Çelik"))
+        else if (incomingResource.CompareTag("Steel") || incomingResource.name.Contains("Çelik"))
         {
             resourceAccepted = true;
             if (currentStrategy is ComputerAssembleStrategy)
