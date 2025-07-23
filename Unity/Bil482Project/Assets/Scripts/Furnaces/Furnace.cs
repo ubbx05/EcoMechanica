@@ -212,21 +212,21 @@ public class Furnace : MonoBehaviour
         if (resourcePrefab != null)
         {
             Vector3 checkPosition = GetCheckPosition();
-            Debug.Log($"Trying to spawn at direction {yon}, position: {checkPosition}");
 
-            Collider2D conveyorBelt = GetConveyorBeltAtPosition(checkPosition);
+            // İlk belt'i bul
+            Collider2D firstBelt = GetConveyorBeltAtPosition(checkPosition);
 
-            if (conveyorBelt != null)
+            if (firstBelt != null)
             {
-                ConveyorBelt beltComponent = conveyorBelt.GetComponent<ConveyorBelt>();
+                ConveyorBelt beltComponent = firstBelt.GetComponent<ConveyorBelt>();
+
+                // İlk belt boşsa direkt spawn et
                 if (beltComponent != null && beltComponent.isEmpty)
                 {
-                    Vector3 targetPosition = conveyorBelt.transform.position;
+                    Vector3 targetPosition = firstBelt.transform.position;
+                    ResourceType resourceType = DetermineResourceType(resourcePrefab);
 
-                    Debug.Log($"Furnace found EMPTY conveyor belt!");
-                    Debug.Log($"Sending resource: {resourcePrefab.name}");
-
-                    // Direkt conveyor belt'e spawn et
+                    // Direkt conveyor belt'e spawn et (Furnace kendi spawn'ını yapıyor)
                     Vector3 spawnPosition = new Vector3(
                         targetPosition.x,
                         targetPosition.y,
@@ -238,18 +238,19 @@ public class Furnace : MonoBehaviour
                     beltComponent.isEmpty = false;
                     beltComponent.ResetTeleportTimer();
 
-                    Debug.Log($"Furnace spawned resource directly on belt!");
+                    Debug.Log($"🔥 Furnace spawned resource directly on belt: {spawnedResource.name}");
                     return true;
                 }
                 else
                 {
-                    Debug.Log($"ConveyorBelt found but OCCUPIED");
+                    // İlk belt doluysa, belt zincirinin kendisi halleder
+                    Debug.Log("🔥 Furnace: First belt occupied, waiting for chain to clear...");
                     return false;
                 }
             }
             else
             {
-                Debug.LogWarning($"No conveyor belt found at direction {yon}");
+                Debug.LogWarning($"⚠️ Furnace: No conveyor belt found at direction {yon}");
                 return false;
             }
         }
@@ -279,6 +280,21 @@ public class Furnace : MonoBehaviour
         return transform.position + offset;
     }
 
+    // ===== Furnace.cs için ResourceType Belirleme Metodu =====
+    // Eğer mevcut değilse, bu metodu Furnace.cs'ye ekleyin:
+
+    private ResourceType DetermineResourceType(GameObject prefab)
+    {
+        // Furnace'ın ürettiği resource'ların tipini belirle
+        if (prefab.CompareTag("DemirIngot"))
+            return ResourceType.hamDemir;
+        else if (prefab.CompareTag("BakirIngot"))
+            return ResourceType.hamBakir;
+        
+
+        // Varsayılan
+        return ResourceType.Iron;
+    }
     private Collider2D GetConveyorBeltAtPosition(Vector3 position)
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(position, new Vector2(0.5f, 0.5f), 0f);

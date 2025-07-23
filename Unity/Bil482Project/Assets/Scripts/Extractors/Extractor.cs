@@ -169,52 +169,39 @@ public class Extractor : MonoBehaviour
 
     // Resource spawn metodu - strategy'ler tarafından çağrılacak
     // Sadece conveyor belt'i bulur ve Action ile bildirim gönderir, spawn işlemini ConveyorBelt yapar
+    // Extractor.cs düzeltmesi
     public void SpawnResource(GameObject resourcePrefab)
     {
         if (resourcePrefab != null)
         {
-            // Yöne göre kontrol pozisyonunu hesapla
             Vector3 checkPosition = GetCheckPosition();
 
-            // DEBUG: Kontrol pozisyonunu yazdır
-            Debug.Log($"🔍 Extractor at: {transform.position}, Direction: {yon}, Check Position: {checkPosition}");
+            // İlk belt'i bul
+            Collider2D firstBelt = GetConveyorBeltAtPosition(checkPosition);
 
-            // O pozisyonda conveyor belt var mı kontrol et
-            Collider2D conveyorBelt = GetConveyorBeltAtPosition(checkPosition);
-
-            if (conveyorBelt != null)
+            if (firstBelt != null)
             {
-                // Conveyor belt bulundu! Action ile bildirim gönder
-                Vector3 targetPosition = conveyorBelt.transform.position;
-                ResourceType resourceType = DetermineResourceType(resourcePrefab);
+                ConveyorBelt beltComponent = firstBelt.GetComponent<ConveyorBelt>();
 
-                // Action'ı tetikle - ConveyorBelt bu bildirimle spawn işlemini yapacak
-                OnResourceSpawned?.Invoke(resourcePrefab, targetPosition, resourceType);
+                // İlk belt boşsa direkt spawn et
+                if (beltComponent != null && beltComponent.isEmpty)
+                {
+                    Vector3 targetPosition = firstBelt.transform.position;
+                    ResourceType resourceType = DetermineResourceType(resourcePrefab);
 
-                Debug.Log($"📡 Extractor found conveyor belt! Sending spawn request...");
-                Debug.Log($"📦 Resource Type: {resourceType}, Target Belt Position: {targetPosition}");
-                Debug.Log($"🎯 Extractor: {gameObject.name}, Direction: {yon}");
+                    OnResourceSpawned?.Invoke(resourcePrefab, targetPosition, resourceType);
+                    Debug.Log($"Resource spawned to first belt: {firstBelt.name}");
+                }
+                else
+                {
+                    // İlk belt doluysa, belt zincirinin kendisi halleder
+                    Debug.Log("First belt occupied, waiting for chain to clear...");
+                }
             }
             else
             {
-                // Conveyor belt bulunamadı - DEBUG bilgilerini artır
-                Debug.LogWarning($"⚠️ No conveyor belt found at direction {yon}! Resource not spawned.");
-                Debug.LogWarning($"🔍 Extractor position: {transform.position}");
-                Debug.LogWarning($"🔍 Checked position: {checkPosition}");
-                Debug.LogWarning($"🔍 Search area: {new Vector2(0.5f, 0.5f)}");
-
-                // Çevredeki tüm collider'ları listele
-                Collider2D[] allColliders = Physics2D.OverlapBoxAll(checkPosition, new Vector2(1f, 1f), 0f);
-                Debug.LogWarning($"🔍 Found {allColliders.Length} colliders in larger area:");
-                foreach (Collider2D col in allColliders)
-                {
-                    Debug.LogWarning($"   - {col.name} (Tag: {col.tag}) at {col.transform.position}");
-                }
+                Debug.LogWarning($"No conveyor belt found at direction {yon}!");
             }
-        }
-        else
-        {
-            Debug.LogError("❌ ResourcePrefab is null! Cannot send spawn request.");
         }
     }
 

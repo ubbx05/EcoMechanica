@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 3509306473638558718}
   - component: {fileID: 1194408475511708600}
   - component: {fileID: 454191524497407135}
+  - component: {fileID: 6874194650542461206}
   m_Layer: 0
   m_Name: demir_ham_0
   m_TagString: HamDemir
@@ -106,8 +107,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -2047880825
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 7965950075184769031, guid: 2731daf33382f954d8dd1bacefc46286, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -166,3 +167,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.34, y: 0.3}
   m_EdgeRadius: 0
+--- !u!114 &6874194650542461206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8735875339431148174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e3e26ac12511841b7b8bcefe7d5006, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceName: HamDemir
+  resourceType: 1
+  resourceIncome: 1

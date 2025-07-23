@@ -179,5 +179,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c664a1ed6957a44eaf6af1f9ecfd19c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceType: Odun
+  resourceName: Wood
+  resourceType: 2
   resourceIncome: 1

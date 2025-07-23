@@ -160,7 +160,7 @@ GameObject:
   - component: {fileID: 1194616122512689697}
   m_Layer: 0
   m_Name: BosTile
-  m_TagString: Untagged
+  m_TagString: BosTile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

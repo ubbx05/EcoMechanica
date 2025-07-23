@@ -179,5 +179,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb699ad8eb7b38d4c957daac5444e701, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceType: HamBakir
+  resourceName: HamBakir
+  resourceType: 0
   resourceIncome: 1

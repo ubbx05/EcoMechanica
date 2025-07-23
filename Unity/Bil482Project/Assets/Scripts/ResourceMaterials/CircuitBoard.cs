@@ -5,7 +5,7 @@ public class CircuitBoard : Resource
     protected override void InitializeResource()
     {
         resourceName = "CircuitBoard";
-        resourceType = ResourceType.Circuitboard;
+        resourceType = ResourceType.CircuitBoard;
         resourceIncome = 100;
     }
 

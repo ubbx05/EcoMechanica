@@ -32,7 +32,8 @@ public enum ResourceType
     CopperWire,
     Steel,
     Magnet,
-    Circuitboard
+    CircuitBoard,
+    Computer
 }
 
 public enum ResearchState
@@ -219,7 +220,7 @@ public class ResearchTree : MonoBehaviour
         circuitboardProduction.prerequisiteIds.Add("magnet_production");
 
         ResearchNode computerProduction = new ResearchNode("computer_production", "Computer Production", "Produce computers for cleaners");
-        computerProduction.AddResourceRequirement(ResourceType.Circuitboard, 10);
+        computerProduction.AddResourceRequirement(ResourceType.CircuitBoard, 10);
         computerProduction.AddResourceRequirement(ResourceType.Steel, 20);
         computerProduction.prerequisiteIds.Add("circuitboard_production");
 

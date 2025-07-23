@@ -44,6 +44,7 @@ public class ConveyorBelt : MonoBehaviour
         // Action'ları dinle
         Extractor.OnResourceSpawned += HandleResourceSpawned;
         Workshop.OnWorkshopResourceSpawned += HandleWorkshopResourceSpawned;
+        Assembler.OnAssemblerResourceSpawned += HandleAssemblerResourceSpawned; // YENİ EKLENEN
     }
 
     void OnDestroy()
@@ -51,6 +52,7 @@ public class ConveyorBelt : MonoBehaviour
         // Memory leak önleme
         Extractor.OnResourceSpawned -= HandleResourceSpawned;
         Workshop.OnWorkshopResourceSpawned -= HandleWorkshopResourceSpawned;
+        Assembler.OnAssemblerResourceSpawned -= HandleAssemblerResourceSpawned; // YENİ EKLENEN
     }
 
     void Update()
@@ -64,7 +66,7 @@ public class ConveyorBelt : MonoBehaviour
     {
         float distance = Vector3.Distance(transform.position, beltPosition);
 
-        if (distance < 1f && isEmpty) // Mesafeyi 0.8'den 2.5'e çıkardık
+        if (distance < 0.8f && isEmpty) // Mesafeyi 0.8'den 2.5'e çıkardık
         {
             Vector3 spawnPosition = new Vector3(
                 transform.position.x,
@@ -118,6 +120,37 @@ public class ConveyorBelt : MonoBehaviour
         else
         {
             Debug.LogWarning($"Workshop resource too far: distance = {distance}");
+        }
+    }
+
+    // Assembler'dan gelen resource'ları işle - YENİ EKLENEN
+    private void HandleAssemblerResourceSpawned(GameObject resourcePrefab, Vector3 beltPosition, ResourceType resourceType)
+    {
+        float distance = Vector3.Distance(transform.position, beltPosition);
+
+        if (distance < 2.5f && isEmpty) // Workshop ile aynı mesafe
+        {
+            Vector3 spawnPosition = new Vector3(
+                transform.position.x,
+                transform.position.y,
+                transform.position.z - 1f  // Görünür olması için
+            );
+
+            GameObject spawnedResource = Instantiate(resourcePrefab, spawnPosition, Quaternion.identity);
+
+            this.resourcePrefab = spawnedResource;
+            isEmpty = false;
+            ResetTeleportTimer();
+
+            Debug.Log($"🔧 Assembler resource {resourcePrefab.name} spawned on belt");
+        }
+        else if (!isEmpty)
+        {
+            Debug.LogWarning($"⚠️ ConveyorBelt occupied, cannot receive assembler: {resourcePrefab.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ Assembler resource too far: distance = {distance}");
         }
     }
 
@@ -435,7 +468,11 @@ public class ConveyorBelt : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // Manuel resource yerleştirme için
-        if (isEmpty && !collision.CompareTag("Extractor") && !collision.CompareTag("Workshop") && !collision.CompareTag("Furnace"))
+        if (isEmpty &&
+            !collision.CompareTag("Extractor") &&
+            !collision.CompareTag("Workshop") &&
+            !collision.CompareTag("Furnace") &&
+            !collision.CompareTag("Assembler")) // YENİ EKLENEN
         {
             resourcePrefab = collision.gameObject;
             isEmpty = false;

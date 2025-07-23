@@ -226,35 +226,35 @@ public class Workshop : Machine
         if (resourcePrefab != null)
         {
             Vector3 checkPosition = GetCheckPosition();
-            Debug.Log($"🔍 Trying to spawn at direction {yon}, position: {checkPosition}");
 
-            Collider2D conveyorBelt = GetConveyorBeltAtPosition(checkPosition);
+            // İlk belt'i bul
+            Collider2D firstBelt = GetConveyorBeltAtPosition(checkPosition);
 
-            if (conveyorBelt != null)
+            if (firstBelt != null)
             {
-                ConveyorBelt beltComponent = conveyorBelt.GetComponent<ConveyorBelt>();
+                ConveyorBelt beltComponent = firstBelt.GetComponent<ConveyorBelt>();
+
+                // İlk belt boşsa direkt spawn et
                 if (beltComponent != null && beltComponent.isEmpty)
                 {
-                    Vector3 targetPosition = conveyorBelt.transform.position;
+                    Vector3 targetPosition = firstBelt.transform.position;
                     ResourceType resourceType = DetermineResourceType(resourcePrefab);
 
-                    Debug.Log($"📡 Workshop found EMPTY conveyor belt!");
-                    Debug.Log($"📦 Sending resource: {resourcePrefab.name}, Type: {resourceType}");
-
+                    // Action ile bildirim gönder - ConveyorBelt spawn işlemini yapacak
                     OnWorkshopResourceSpawned?.Invoke(resourcePrefab, targetPosition, resourceType);
-
-                    Debug.Log($"✅ Workshop Action triggered!");
+                    Debug.Log($"🏭 Workshop found empty belt, sending spawn request");
                     return true;
                 }
                 else
                 {
-                    Debug.Log($"⚠️ ConveyorBelt found but OCCUPIED");
+                    // İlk belt doluysa, belt zincirinin kendisi halleder
+                    Debug.Log("🏭 Workshop: First belt occupied, waiting for chain to clear...");
                     return false;
                 }
             }
             else
             {
-                Debug.LogWarning($"⚠️ No conveyor belt found at direction {yon}");
+                Debug.LogWarning($"⚠️ Workshop: No conveyor belt found at direction {yon}");
                 return false;
             }
         }
