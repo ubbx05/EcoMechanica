@@ -6,7 +6,7 @@ public class Copper : Resource
     {
         resourceName = "Copper";
         resourceType = ResourceType.Copper;
-        resourceIncome = 3;
+        resourceIncome = 2;
     }
 
     /*

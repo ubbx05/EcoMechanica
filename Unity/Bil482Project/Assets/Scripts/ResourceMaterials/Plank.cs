@@ -6,7 +6,7 @@ public class Plank : Resource
     {
         resourceName = "Plank";
         resourceType = ResourceType.Plank;
-        resourceIncome = 3;
+        resourceIncome = 2;
     }
 
     /*

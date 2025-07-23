@@ -9,15 +9,10 @@ public class ResearchLab : MonoBehaviour
 
     [Header("Research Lab Settings")]
     public float researchRadius = 2f;
-    public LayerMask resourceLayerMask = -1;
 
     [Header("Current Research")]
     public string currentResearchId = "";
     public bool isResearching = false;
-
-    [Header("Gold Conversion Settings")]
-    [SerializeField] private int goldPerUnresearchedResource = 10; // Research edilmeyen resource ba��na gold
-    [SerializeField] private float goldConversionInterval = 3f; // Gold'a �evirme aral���
 
     [Header("Debug")]
     public bool showDebugInfo = true;
@@ -31,13 +26,9 @@ public class ResearchLab : MonoBehaviour
     private List<GameObject> collectedResources = new List<GameObject>();
     private Dictionary<ResourceType, int> resourceCounts = new Dictionary<ResourceType, int>();
 
-    // Gold conversion fields
-    private Queue<GameObject> unresearchedResourceQueue = new Queue<GameObject>();
-    private Coroutine goldConversionCoroutine;
-
     void Start()
     {
-        // ResearchTree instance'�na eri�im
+        // ResearchTree instance'ına erişim
         researchTree = ResearchTree.Instance;
         if (researchTree == null)
         {
@@ -46,9 +37,6 @@ public class ResearchLab : MonoBehaviour
 
         // Resource count dictionary'sini initialize et
         InitializeResourceCounts();
-
-        // Gold conversion coroutine'ini ba�lat
-        StartGoldConversion();
     }
 
     void Update()
@@ -63,63 +51,126 @@ public class ResearchLab : MonoBehaviour
             CheckResearchProgress();
         }
 
-        // �evredeki resource'lar� s�rekli kontrol et
+        // Çevredeki resource'ları sürekli kontrol et
         CheckForNewResources();
+    }
+
+    // Collision ile gelen resource'ları kontrol et
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision == null || collision.gameObject == null)
+        {
+            return;
+        }
+
+        GameObject incomingResource = collision.gameObject;
+        Debug.Log($"🔬 ResearchLab collision detected: {incomingResource.name}");
+
+        // Resource component'ini kontrol et - PARENT VE CHILD'DA ARA
+        Resource resourceComponent = incomingResource.GetComponent<Resource>();
+        if (resourceComponent == null)
+        {
+            // Parent'ta yoksa child'larda ara
+            resourceComponent = incomingResource.GetComponentInChildren<Resource>();
+        }
+
+        if (resourceComponent != null)
+        {
+            ResourceType resourceType = resourceComponent.getType();
+            int goldAmount = resourceComponent.getIncome();
+
+            Debug.Log($"🔍 DEBUG: Resource {incomingResource.name} has income: {goldAmount}");
+
+            // Aktif research varsa ve bu resource gerekli mi kontrol et
+            if (isResearching && currentNode != null && IsResourceNeededForCurrentResearch(resourceType))
+            {
+                // Research için gerekli - research'e ver, gold verme
+                CollectResourceForResearch(incomingResource, resourceComponent, resourceType);
+                Debug.Log($"🔬 Resource {incomingResource.name} added to research");
+            }
+            else
+            {
+                // Research edilmiyor veya bu resource gerekli değil - gold'a çevir                
+                if (gameController != null)
+                {
+                    int oldGold = gameController.Gold;
+                    gameController.Gold += goldAmount;
+                    Debug.Log($"💰 BEFORE: {oldGold} | ADDING: {goldAmount} | AFTER: {gameController.Gold}");
+                    Debug.Log($"💰 Added {goldAmount} gold from {incomingResource.name}. Total Gold: {gameController.Gold}");
+                }
+                else
+                {
+                    Debug.LogError("GameController reference is null!");
+                }
+
+                // Resource'ı yok et
+                Destroy(incomingResource);
+                Debug.Log($"🗑️ Resource {incomingResource.name} consumed for gold");
+            }
+        }
+        else
+        {
+            // Resource component'i yoksa da gold'a çevir (default değerle)
+            Debug.Log($"⚠️ Object {incomingResource.name} has no Resource component - converting to default gold");
+
+            if (gameController != null)
+            {
+                gameController.Gold += 1; // Default gold değeri
+                Debug.Log($"💰 Added 1 gold from non-resource {incomingResource.name}. Total Gold: {gameController.Gold}");
+            }
+
+            Destroy(incomingResource);
+            Debug.Log($"🗑️ Non-resource {incomingResource.name} consumed for default gold");
+        }
     }
 
     private void InitializeResourceCounts()
     {
-        // T�m ResourceType'lar� 0 ile initialize et
+        // Tüm ResourceType'ları 0 ile initialize et
         foreach (ResourceType type in System.Enum.GetValues(typeof(ResourceType)))
         {
             resourceCounts[type] = 0;
         }
     }
 
-    // �evredeki yeni resource'lar� kontrol et
+    // Çevredeki yeni resource'ları kontrol et
     private void CheckForNewResources()
     {
-        Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(transform.position, researchRadius, resourceLayerMask);
+        Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(transform.position, researchRadius);
 
         foreach (Collider2D obj in nearbyObjects)
         {
             GameObject resourceObj = obj.gameObject;
 
-            // Zaten i�lenmi� mi kontrol et
-            if (collectedResources.Contains(resourceObj) ||
-                unresearchedResourceQueue.Contains(resourceObj))
+            // Zaten işlenmiş mi kontrol et
+            if (collectedResources.Contains(resourceObj))
             {
                 continue;
             }
 
             // Resource component'ini kontrol et
             Resource resourceComponent = obj.GetComponent<Resource>();
-            if (resourceComponent != null || IsLegacyResource(resourceObj))
+            if (resourceComponent != null)
             {
                 ProcessIncomingResource(resourceObj, resourceComponent);
             }
         }
     }
 
-    // Gelen resource'� i�le - research'e dahil et veya gold kuyru�una ekle
+    // Gelen resource'ı işle - research'e dahil et
     private void ProcessIncomingResource(GameObject resourceObj, Resource resourceComponent)
     {
-        ResourceType resourceType = GetResourceType(resourceObj, resourceComponent);
+        ResourceType resourceType = resourceComponent.getType();
 
         // Aktif research varsa ve bu resource gerekli mi kontrol et
         if (isResearching && currentNode != null && IsResourceNeededForCurrentResearch(resourceType))
         {
-            // Research i�in gerekli - normal research sistemine dahil et
+            // Research için gerekli - normal research sistemine dahil et
             CollectResourceForResearch(resourceObj, resourceComponent, resourceType);
-        }
-        else
-        {
-            // Research edilmiyor veya bu resource gerekli de�il - gold'a �evir
-            AddToGoldConversionQueue(resourceObj, resourceType);
         }
     }
 
-    // Mevcut research i�in bu resource gerekli mi?
+    // Mevcut research için bu resource gerekli mi?
     private bool IsResourceNeededForCurrentResearch(ResourceType resourceType)
     {
         if (currentNode == null) return false;
@@ -135,7 +186,7 @@ public class ResearchLab : MonoBehaviour
         return false;
     }
 
-    // Resource'� research i�in topla
+    // Resource'ı research için topla
     private void CollectResourceForResearch(GameObject resourceObj, Resource resourceComponent, ResourceType resourceType)
     {
         if (!collectedResources.Contains(resourceObj))
@@ -143,7 +194,7 @@ public class ResearchLab : MonoBehaviour
             collectedResources.Add(resourceObj);
             resourceCounts[resourceType]++;
 
-            // Resource'u deaktif et (topland�)
+            // Resource'u deaktif et (toplandı)
             resourceObj.SetActive(false);
 
             if (showDebugInfo)
@@ -154,111 +205,6 @@ public class ResearchLab : MonoBehaviour
             // Hemen research'e ekle
             TryAddResourceToCurrentResearch(resourceType);
         }
-    }
-
-    // Resource'� gold d�n���m kuyru�una ekle
-    private void AddToGoldConversionQueue(GameObject resourceObj, ResourceType resourceType)
-    {
-        unresearchedResourceQueue.Enqueue(resourceObj);
-
-        // Resource'u deaktif et
-        resourceObj.SetActive(false);
-
-        if (showDebugInfo)
-        {
-            Debug.Log($"Added {resourceType} to gold conversion queue");
-        }
-    }
-
-    // Gold d�n���m sistemini ba�lat
-    private void StartGoldConversion()
-    {
-        if (goldConversionCoroutine != null)
-        {
-            StopCoroutine(goldConversionCoroutine);
-        }
-        goldConversionCoroutine = StartCoroutine(GoldConversionRoutine());
-    }
-
-    // Gold d�n���m coroutine
-    private System.Collections.IEnumerator GoldConversionRoutine()
-    {
-        while (true)
-        {
-            if (unresearchedResourceQueue.Count > 0)
-            {
-                GameObject resourceToConvert = unresearchedResourceQueue.Dequeue();
-
-                if (resourceToConvert != null)
-                {
-                    ConvertResourceToGold(resourceToConvert);
-                }
-            }
-
-            yield return new WaitForSeconds(goldConversionInterval);
-        }
-    }
-
-    // Resource'� gold'a �evir
-    private void ConvertResourceToGold(GameObject resource)
-    {
-        ResourceType resourceType = GetResourceType(resource, resource.GetComponent<Resource>());
-
-        // Gold ekle
-        gameController.Gold += goldPerUnresearchedResource;
-
-        if (showDebugInfo)
-        {
-            Debug.Log($"Converted {resourceType} to {goldPerUnresearchedResource} gold! Total Gold: {gameController.Gold}");
-        }
-
-        // Efekt g�ster
-        ShowGoldConversionEffect(resource.transform.position);
-
-        // Resource'� yok et
-        Destroy(resource);
-    }
-
-    // Gold d�n���m efekti g�ster
-    private void ShowGoldConversionEffect(Vector3 position)
-    {
-        // Burada partik�l efekti, ses, animasyon vb. eklenebilir
-        Debug.Log($"Gold conversion effect at {position}");
-    }
-
-    // Resource type'�n� belirle
-    private ResourceType GetResourceType(GameObject resourceObj, Resource resourceComponent)
-    {
-        if (resourceComponent != null)
-        {
-            //return ConvertStringToResourceType(resourceComponent.getType());
-            return resourceComponent.getType();
-        }
-        else
-        {
-            return GetLegacyResourceType(resourceObj);
-        }
-    }
-
-    // Legacy resource type'�n� belirle
-    private ResourceType GetLegacyResourceType(GameObject obj)
-    {
-        if (obj.GetComponent<Odun>() != null)
-            return ResourceType.Wood;
-        else if (obj.GetComponent<HamDemir>() != null)
-            return ResourceType.Iron;
-        else if (obj.GetComponent<HamBakir>() != null)
-            return ResourceType.CopperOre;
-        else
-            return ResourceType.Wood; // Default
-    }
-
-    // Legacy resource kontrol�
-    private bool IsLegacyResource(GameObject obj)
-    {
-        return obj.GetComponent<Odun>() != null ||
-               obj.GetComponent<HamDemir>() != null ||
-               obj.GetComponent<HamBakir>() != null;
     }
 
     // Mevcut research'e resource eklemeyi dene
@@ -298,7 +244,7 @@ public class ResearchLab : MonoBehaviour
         {
             if (resources[i] != null)
             {
-                // Research'te kullan�lan resource'lar� gold income'a dahil etme
+                // Research'te kullanılan resource'ları gold income'a dahil etme
                 if (!IsResourceUsedInResearch(resources[i]))
                 {
                     sonuc += resources[i].getIncome();
@@ -310,31 +256,28 @@ public class ResearchLab : MonoBehaviour
 
     private bool IsResourceUsedInResearch(Resource resource)
     {
-        // E�er research devam etmiyorsa, hi�bir resource kullan�lm�yor
+        // Eğer research devam etmiyorsa, hiçbir resource kullanılmıyor
         if (!isResearching || currentNode == null)
             return false;
 
         // Resource'un GameObject'ini kontrol et
         GameObject resourceObj = resource.gameObject;
 
-        // Toplanan resource'lar aras�nda var m�?
+        // Toplanan resource'lar arasında var mı?
         if (collectedResources.Contains(resourceObj))
             return true;
 
-        // Aktif olmayan resource'lar research'te kullan�l�yor olabilir
+        // Aktif olmayan resource'lar research'te kullanılıyor olabilir
         if (!resourceObj.activeInHierarchy)
         {
-            // Resource type'�n� kontrol et
-            //string resourceTypeStr = resource.getType();
-            //ResourceType resourceType = ConvertStringToResourceType(resourceTypeStr);
             ResourceType resourceType = resource.getType();
 
-            // Bu resource type'� current research'te gerekli mi?
+            // Bu resource type'ı current research'te gerekli mi?
             foreach (var requirement in currentNode.resourceRequirements)
             {
                 if (requirement.resourceType == resourceType)
                 {
-                    return true; // Bu resource research'te kullan�l�yor
+                    return true; // Bu resource research'te kullanılıyor
                 }
             }
         }
@@ -350,10 +293,10 @@ public class ResearchLab : MonoBehaviour
             return;
         }
 
-        // �evredeki resource'lar� topla
+        // Çevredeki resource'ları topla
         CollectNearbyResources();
 
-        // Toplanan resource'lar� research'e ekle
+        // Toplanan resource'ları research'e ekle
         ProcessCollectedResources();
     }
 
@@ -371,14 +314,14 @@ public class ResearchLab : MonoBehaviour
             return;
         }
 
-        // Research ba�latmay� dene
+        // Research başlatmayı dene
         if (researchTree.StartResearch(researchId))
         {
             currentResearchId = researchId;
             isResearching = true;
             currentNode = researchTree.GetResearchNode(researchId);
 
-            // Mevcut resource'lar� temizle
+            // Mevcut resource'ları temizle
             ClearCollectedResources();
 
             Debug.Log($"Started research: {currentNode.name}");
@@ -396,37 +339,20 @@ public class ResearchLab : MonoBehaviour
 
         Debug.Log($"Stopped research: {currentNode.name}");
 
-        // Research'teki resource'lar� gold kuyru�una aktar
-        TransferResearchResourcesToGoldQueue();
-
         currentResearchId = "";
         isResearching = false;
         currentNode = null;
     }
 
-    // Research'teki resource'lar� gold kuyru�una aktar
-    private void TransferResearchResourcesToGoldQueue()
-    {
-        foreach (GameObject resource in collectedResources)
-        {
-            if (resource != null)
-            {
-                unresearchedResourceQueue.Enqueue(resource);
-                Debug.Log($"Transferred research resource to gold queue: {resource.name}");
-            }
-        }
-        ClearCollectedResources();
-    }
-
     private void CollectNearbyResources()
     {
-        // Bu metod art�k CheckForNewResources() taraf�ndan s�rekli �a�r�l�yor
-        // Ama manuel research tetikleme i�in hala kullan�labilir
+        // Bu metod artık CheckForNewResources() tarafından sürekli çağrılıyor
+        // Ama manuel research tetikleme için hala kullanılabilir
     }
 
     private void ProcessCollectedResources()
     {
-        // Research i�in toplanan resource'lar� i�le
+        // Research için toplanan resource'ları işle
         foreach (ResourceType type in resourceCounts.Keys)
         {
             if (resourceCounts[type] > 0)
@@ -440,7 +366,7 @@ public class ResearchLab : MonoBehaviour
     {
         if (currentNode == null) return;
 
-        // Research tamamland� m� kontrol et
+        // Research tamamlandı mı kontrol et
         if (currentNode.state == ResearchState.Completed)
         {
             Debug.Log($"Research completed: {currentNode.name}!");
@@ -448,7 +374,7 @@ public class ResearchLab : MonoBehaviour
         }
         else if (showDebugInfo)
         {
-            // Progress bilgisini g�ster
+            // Progress bilgisini göster
             float progress = currentNode.GetCompletionPercentage();
             if (progress > 0)
             {
@@ -459,34 +385,16 @@ public class ResearchLab : MonoBehaviour
 
     private void OnResearchCompleted()
     {
-        // Research tamamland���nda yap�lacak i�lemler
+        // Research tamamlandığında yapılacak işlemler
         isResearching = false;
         currentResearchId = "";
-
-        // Kalan resource'lar� gold kuyru�una aktar
-        TransferResearchResourcesToGoldQueue();
+        ClearCollectedResources();
     }
 
     private void ClearCollectedResources()
     {
         collectedResources.Clear();
         InitializeResourceCounts();
-    }
-
-    private ResourceType ConvertStringToResourceType(string resourceTypeStr)
-    {
-        // String'den ResourceType'a d�n��t�rme
-        switch (resourceTypeStr)
-        {
-            case "Odun":
-                return ResourceType.Wood;
-            case "HamDemir":
-                return ResourceType.Iron;
-            case "HamBakir":
-                return ResourceType.CopperOre;
-            default:
-                return ResourceType.Wood; // Default de�er
-        }
     }
 
     private void ShowResearchRequirements()
@@ -500,7 +408,7 @@ public class ResearchLab : MonoBehaviour
         }
     }
 
-    // Public metodlar - UI veya di�er sistemler i�in
+    // Public metodlar - UI veya diğer sistemler için
     public List<ResearchNode> GetAvailableResearch()
     {
         return researchTree?.GetAvailableResearch() ?? new List<ResearchNode>();
@@ -521,7 +429,7 @@ public class ResearchLab : MonoBehaviour
         return isResearching;
     }
 
-    // Resource ekleme metodu (manuel resource ekleme i�in)
+    // Resource ekleme metodu (manuel resource ekleme için)
     public void AddResource(Resource resource)
     {
         if (resource != null && !resources.Contains(resource))
@@ -538,49 +446,20 @@ public class ResearchLab : MonoBehaviour
         }
     }
 
-    // Gold d�n���m durumunu kontrol etme metodlar�
-    public int GetGoldQueueCount()
-    {
-        return unresearchedResourceQueue.Count;
-    }
-
-    public void SetGoldPerResource(int goldAmount)
-    {
-        goldPerUnresearchedResource = goldAmount;
-    }
-
-    public void SetGoldConversionInterval(float interval)
-    {
-        goldConversionInterval = interval;
-        // Coroutine'i yeniden ba�lat
-        StartGoldConversion();
-    }
-
-    // Debug i�in gold kuyru�unu g�ster
+    // Debug için research alanını göster
     void OnDrawGizmos()
     {
-        // Lab'�n etki alan�n� g�ster
+        // Lab'ın etki alanını göster
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(transform.position, new Vector3(researchRadius * 2, researchRadius * 2, 0f));
 
-        // Research resource'lar�n� g�ster (mavi)
+        // Research resource'larını göster (mavi)
         if (Application.isPlaying && collectedResources.Count > 0)
         {
             Gizmos.color = Color.cyan;
             for (int i = 0; i < collectedResources.Count; i++)
             {
                 Vector3 pos = transform.position + new Vector3(i * 0.2f - 0.4f, 0.7f, 0);
-                Gizmos.DrawSphere(pos, 0.1f);
-            }
-        }
-
-        // Gold kuyru�undaki resource'lar� g�ster (sar�)
-        if (Application.isPlaying && unresearchedResourceQueue.Count > 0)
-        {
-            Gizmos.color = Color.yellow;
-            for (int i = 0; i < unresearchedResourceQueue.Count; i++)
-            {
-                Vector3 pos = transform.position + new Vector3(i * 0.2f - 0.4f, -0.7f, 0);
                 Gizmos.DrawSphere(pos, 0.1f);
             }
         }

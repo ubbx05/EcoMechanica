@@ -5,9 +5,9 @@ public abstract class Resource : MonoBehaviour
 {
 
     [Header("Resource Properties")]
-    [SerializeField] protected string resourceName;
-    [SerializeField] protected ResourceType resourceType;
-    [SerializeField] protected int resourceIncome;
+    [SerializeField] public string resourceName;
+    [SerializeField] public ResourceType resourceType;
+    [SerializeField] public int resourceIncome;
 
     // Events
     public static event Action<Resource> OnResourceCreated;

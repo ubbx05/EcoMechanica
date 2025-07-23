@@ -208,3 +208,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7152ef9fe1e88f544988f016725e6a10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  assemblyInterval: 6
+  productA_envanter: 0
+  productB_envanter: 0
+  demirIngotPrefab: {fileID: 542867654618933243, guid: c5950a2605bac5648908afc7252034b7, type: 3}
+  magnetPrefab: {fileID: 0}
+  circuitBoardPrefab: {fileID: 0}
+  steelPrefab: {fileID: 0}
+  computer_prefab: {fileID: 0}
+  circuitBoard_prefab: {fileID: 0}

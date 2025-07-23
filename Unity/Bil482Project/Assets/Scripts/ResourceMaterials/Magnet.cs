@@ -6,7 +6,7 @@ public class Magnet : Resource
     {
         resourceName = "Magnet";
         resourceType = ResourceType.Magnet;
-        resourceIncome = 10;
+        resourceIncome = 3;
     }
 
     /*

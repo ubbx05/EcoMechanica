@@ -15,6 +15,7 @@ public class ConveyorBelt : MonoBehaviour
     private ConveyorBelt nextConveyorBelt;
     private Workshop targetWorkshop;
     private Furnace targetFurnace; // FURNACE DESTEĞİ EKLENDİ
+    private ResearchLab targetResearchLab; // YENİ EKLENEN
 
     [Header("Teleportation Timer")]
     private float teleportTimer = 0f;
@@ -186,6 +187,10 @@ public class ConveyorBelt : MonoBehaviour
             else if (targetFurnace != null) // FURNACE TELEPORT EKLENDİ
             {
                 TeleportResourceToFurnace();
+            }
+            else if (targetResearchLab != null) // YENİ EKLENEN
+            {
+                TeleportResourceToResearchLab();
             }
         }
     }
@@ -365,6 +370,85 @@ public class ConveyorBelt : MonoBehaviour
         }
     }
 
+    // YENİ METOD - ResearchLab'a teleport
+    private void TeleportResourceToResearchLab()
+    {
+        if (targetResearchLab != null && resourcePrefab != null)
+        {
+            Debug.Log($"Teleporting to research lab: {resourcePrefab.name}");
+
+            GameObject resourceToTransfer = resourcePrefab;
+            resourcePrefab = null;
+            isEmpty = true;
+
+            // Physics durdur
+            Rigidbody2D rb = resourceToTransfer.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.bodyType = RigidbodyType2D.Static;
+            }
+
+            // Resource'ı ConveyorBelt'ten geldiğini işaretle
+            TeleportedResource teleportMarker = resourceToTransfer.GetComponent<TeleportedResource>();
+            if (teleportMarker == null)
+            {
+                teleportMarker = resourceToTransfer.AddComponent<TeleportedResource>();
+            }
+            teleportMarker.isTeleportedFromConveyorBelt = true;
+
+            // ResearchLab'a teleport et
+            resourceToTransfer.transform.position = new Vector3(
+                targetResearchLab.transform.position.x,
+                targetResearchLab.transform.position.y,
+                targetResearchLab.transform.position.z - 1f
+            );
+
+            // SpriteRenderer görünür tut
+            SpriteRenderer sr = resourceToTransfer.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingOrder = 10;
+            }
+
+            // Collider trigger yap
+            Collider2D resourceCollider = resourceToTransfer.GetComponent<Collider2D>();
+            if (resourceCollider == null)
+            {
+                resourceCollider = resourceToTransfer.AddComponent<BoxCollider2D>();
+            }
+            resourceCollider.isTrigger = true;
+
+            // ResearchLab trigger'ını çağır - PARENT VE CHILD KONTROL EDİLECEK
+            try
+            {
+                // Önce parent'ta Resource ara
+                Resource resourceComponent = resourceToTransfer.GetComponent<Resource>();
+                if (resourceComponent == null)
+                {
+                    // Parent'ta yoksa child'larda ara
+                    resourceComponent = resourceToTransfer.GetComponentInChildren<Resource>();
+                    if (resourceComponent == null)
+                    {
+                        Debug.LogWarning($"No Resource component found in {resourceToTransfer.name} or its children");
+                    }
+                }
+
+                targetResearchLab.SendMessage("OnTriggerEnter2D", resourceCollider, SendMessageOptions.DontRequireReceiver);
+                Debug.Log("Resource teleported to research lab");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"ResearchLab trigger failed: {e.Message}");
+                if (resourceToTransfer != null)
+                {
+                    Destroy(resourceToTransfer);
+                }
+            }
+        }
+    }
+
     public void ResetTeleportTimer()
     {
         teleportTimer = 0f;
@@ -394,6 +478,7 @@ public class ConveyorBelt : MonoBehaviour
                 nextConveyorBelt = belt;
                 targetWorkshop = null;
                 targetFurnace = null; // FURNACE NULL YAP
+                targetResearchLab = null; // YENİ EKLENEN
                 if (flag3)
                 {
                     Debug.Log("Next conveyor belt found");
@@ -411,6 +496,7 @@ public class ConveyorBelt : MonoBehaviour
                     targetWorkshop = workshop;
                     nextConveyorBelt = null;
                     targetFurnace = null; // FURNACE NULL YAP
+                    targetResearchLab = null; // YENİ EKLENEN
                     if (flag3)
                     {
                         Debug.Log("Target workshop found");
@@ -429,6 +515,7 @@ public class ConveyorBelt : MonoBehaviour
                         targetFurnace = furnace;
                         nextConveyorBelt = null;
                         targetWorkshop = null;
+                        targetResearchLab = null; // YENİ EKLENEN
                         if (flag3)
                         {
                             Debug.Log("Target furnace found");
@@ -440,13 +527,34 @@ public class ConveyorBelt : MonoBehaviour
                     }
                     else
                     {
-                        nextConveyorBelt = null;
-                        targetWorkshop = null;
-                        targetFurnace = null; // FURNACE NULL YAP
-                        if (flag1 && flag4)
+                        // YENİ EKLENEN - RESEARCHLAB KONTROLÜ
+                        ResearchLab researchLab = hit.GetComponent<ResearchLab>();
+                        if (researchLab != null)
                         {
-                            Debug.Log("No next target found");
-                            flag1 = false;
+                            targetResearchLab = researchLab;
+                            nextConveyorBelt = null;
+                            targetWorkshop = null;
+                            targetFurnace = null;
+                            if (flag3)
+                            {
+                                Debug.Log("Target research lab found");
+                                flag3 = false;
+                                flag4 = false;
+                            }
+                            flag1 = true;
+                            flag2 = true;
+                        }
+                        else
+                        {
+                            nextConveyorBelt = null;
+                            targetWorkshop = null;
+                            targetFurnace = null; // FURNACE NULL YAP
+                            targetResearchLab = null; // YENİ EKLENEN
+                            if (flag1 && flag4)
+                            {
+                                Debug.Log("No next target found");
+                                flag1 = false;
+                            }
                         }
                     }
                 }
@@ -457,6 +565,7 @@ public class ConveyorBelt : MonoBehaviour
             nextConveyorBelt = null;
             targetWorkshop = null;
             targetFurnace = null; // FURNACE NULL YAP
+            targetResearchLab = null; // YENİ EKLENEN
             if (flag2)
             {
                 flag2 = false;
@@ -472,7 +581,8 @@ public class ConveyorBelt : MonoBehaviour
             !collision.CompareTag("Extractor") &&
             !collision.CompareTag("Workshop") &&
             !collision.CompareTag("Furnace") &&
-            !collision.CompareTag("Assembler")) // YENİ EKLENEN
+            !collision.CompareTag("Assembler") &&
+            !collision.CompareTag("ResearchLab")) // YENİ EKLENEN
         {
             resourcePrefab = collision.gameObject;
             isEmpty = false;

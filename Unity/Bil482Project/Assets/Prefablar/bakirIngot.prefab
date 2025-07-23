@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6270905012239590249}
   - component: {fileID: 3994064204262931065}
   - component: {fileID: 4500528621405301667}
+  - component: {fileID: 9159578327970157246}
   m_Layer: 0
   m_Name: bakir_ingoPNG
   m_TagString: BakirIngot
@@ -134,6 +135,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.34, y: 0.26}
   m_EdgeRadius: 0
+--- !u!114 &9159578327970157246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3164578589417017877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea9dda2664e892846bbac0c6e5832a1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceName: 
+  resourceType: 6
+  resourceIncome: 2
 --- !u!1 &8434675891358387536
 GameObject:
   m_ObjectHideFlags: 0

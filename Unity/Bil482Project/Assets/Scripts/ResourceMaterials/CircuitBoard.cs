@@ -6,7 +6,7 @@ public class CircuitBoard : Resource
     {
         resourceName = "CircuitBoard";
         resourceType = ResourceType.CircuitBoard;
-        resourceIncome = 100;
+        resourceIncome = 4;
     }
 
     /*

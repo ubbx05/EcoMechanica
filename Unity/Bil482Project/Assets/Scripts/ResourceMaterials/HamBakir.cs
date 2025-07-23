@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class HamBakir : Resource
 {
+    
     protected override void InitializeResource()
     {
         resourceName = "HamBakir";
@@ -10,7 +11,7 @@ public class HamBakir : Resource
     }
 
     /*
-    private void Awake()
+    private voidAwake()
     {
         resourceType = "HamBakir";
         resourceIncome = 1;

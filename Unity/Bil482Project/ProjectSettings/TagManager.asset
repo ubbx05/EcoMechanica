@@ -25,6 +25,9 @@ TagManager:
   - DemirDisli
   - ResearchLab
   - Steel
+  - CircuitBoard
+  - Magnet
+  - Computer
   layers:
   - Default
   - TransparentFX
